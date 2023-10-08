@@ -126,6 +126,11 @@ https://www.exploit-db.com/exploits/44976
 - NOTE! When uploading file to CMS copy to .php file type in the upload folder
 ```
 
+### IIS FTP file upload exploit
+```
+https://infinitelogins.com/2020/01/20/hack-the-box-write-up-devel-without-metasploit/
+```
+
 
 
 

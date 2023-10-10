@@ -25,6 +25,7 @@ wpscan --url http://192.168.1.100/wordpress/ -U users.txt -P /usr/share/wordlist
 ``` sudo nmap -p- --open -sV -A -T4 192.168.2.20 | grep "open" | awk '{print $1, $3}' > filtered_results.txt ```
 
 
+
 ## Enumerating
 
 ### Enum4Linux
@@ -321,6 +322,9 @@ hashcat -m 0 -a 0 md5.txt /usr/share/wordlists/rockyou.txt
 ### John the ripper
 ```
 john hash --wordlist=/user/share/wordlists/rockyou.txt --format=md5crypt
+
+format
+username:hash
 ```
 ``` john hash --show```
 Include full passwd file entry in hash
@@ -356,6 +360,11 @@ hashcat -m 18200
 hashcat -m 1000
 #responder hash
 hashcat -m 5600
+```
+
+### Find username and password in sql file or similar
+```
+grep -Ei "user|password" dump.sql
 ```
 
 

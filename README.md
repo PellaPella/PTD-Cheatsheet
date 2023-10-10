@@ -121,7 +121,14 @@ ffuf -w /path/to/wordlist -u https://target  -H 'Host: FUZZ.TARGET.DOMAIN'
 # Find log file for poisoning
 cat /usr/share/SecLists/Fuzzing/LFI/LFI-gracefulsecurity-linux.txt | grep log > log.txt 
 ffuf -u http://${IP}/LFI.php?file=FUZZ -w log.txt -fr "Failed opening" -o fuzz.txt 
-
+```
+### ZIP cracking
+```
+wget http://192.168.1.135/backup
+file backup
+frackzip -D -v -u -p /usr/share/wordlists/rockyou.txt backup
+unzip backup
+cat dump.sql
 ```
 
 

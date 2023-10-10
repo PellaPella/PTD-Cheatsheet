@@ -360,6 +360,8 @@ hashcat -m 18200
 hashcat -m 1000
 #responder hash
 hashcat -m 5600
+#MYSQL file hashes
+mysql-sha1
 ```
 
 ### Find username and password in sql file or similar

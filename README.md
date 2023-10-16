@@ -91,6 +91,11 @@ Use -X .php OR .txt to filter files
 sudo mount -t nfs 192.168.2.20:/tmp /mnt/nfs
 go to /mnt/nfs
 ```
+### FTP
+```
+View FTP files in browser to uplod and run
+- http://IP/file_name IF the directory is root directory - if not use the path
+```
 ### VNC Viewer
 ```
 vncviewer 192.168.2.20:5901

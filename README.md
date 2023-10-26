@@ -179,10 +179,12 @@ sudo systemctl restart
 
 ```
 
-
-
-
-
+### find all files that have SUID bit set
+```
+find / -perm -u=s -type f 2>/dev/null
+https://gtfobins.github.io/
+use this to find binary that will give root based off results of SUID bit search
+```
 
 
 ### Backup File

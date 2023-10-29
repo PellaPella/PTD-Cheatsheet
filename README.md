@@ -151,6 +151,7 @@ cat dump.sql
 
 
 ## Escalate Privileges
+https://github.com/gurkylee/Linux-Privilege-Escalation-Basics
 
 ### Execute by adding /bin/bash
 ```

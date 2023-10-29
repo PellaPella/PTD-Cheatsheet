@@ -426,9 +426,13 @@ grep -Ei "user|password" dump.sql
 
 ## General Commands
 
-### SSH User Login
+### SSH User Logins and exploits
 ```ssh -i ssh_key user@192.168.x.x
 Make sure ssh_key is the private key -> public key can show username though
+
+to download a file from kali IF you have SSH access to the machine
+scp -i /mnt/user_sshkey user@192.168.2.105:/folder_name/passwordsDB.kdbx .
+scp -i sshKey groundfloor@192.168.2.105:/keepass/passwordsDB.kdbx .
 ```
 ### File permissions to run
 ```chmod 777 OR chmod 600```

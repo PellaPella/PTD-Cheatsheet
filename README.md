@@ -426,7 +426,8 @@ grep -Ei "user|password" dump.sql
 ## General Commands
 
 ### SSH User Login
-```ssh -i ssh_key.txt user@192.168.x.x```
+```ssh -i ssh_key user@192.168.x.x
+Make sure ssh_key is the private key -> public key can show username though```
 ### File permissions to run
 ```chmod 777 OR chmod 600```
 

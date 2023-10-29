@@ -96,6 +96,7 @@ Use -X .php OR .txt to filter files
 ```
 ### Mounting
 ```
+showmount -e 192.168.2.x
 sudo mount -t nfs 192.168.2.20:/tmp /mnt/nfs
 go to /mnt/nfs
 ```

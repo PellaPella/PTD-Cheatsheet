@@ -1,6 +1,21 @@
 # PTD-Cheatsheet
 PTD Unit Cheat Sheet based on class notes
 
+### Priv Esc Helpers
+```
+Local Enumeration Tool
+Linpeas, Winpeas for informative system enumeration  -> LINPEAS INCLUDES LINUX HELPER
+https://github.com/carlospolop/PEASS-ng/tree/master
+
+pspy for linux process monitoring
+https://github.com/DominicBreuker/pspy
+
+SharpUp, Seatbelt for windows priv esc vector
+https://github.com/r3motecontrol/Ghostpack-CompiledBinaries
+
+Rubeus for active directory attack in windows host
+https://github.com/r3motecontrol/Ghostpack-CompiledBinaries
+```
 ### Python One Liner
 ``` python3 -c 'import pty;pty.spawn("/bin/bash")' ```
 ### Searchsploit

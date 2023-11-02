@@ -566,6 +566,8 @@ whoami
 net user <username>
  - net user administrator
  - net user admin
+CHECK IF net users have RDP access or not
+
 systeminfo
 net config Workstation 
 net users

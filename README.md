@@ -587,6 +587,14 @@ cd C:\ & findstr /SI /M "password" *.xml *.ini *.txt
 findstr /si password *.xml *.ini *.txt *.config 2>nul >> results.txt
 findstr /spin "password" *.*
 ```
+
+### Search history ConsoleHost_history.txt
+```
+C:\users\USERNAME\Appdata\Roaming\Microsoft\Windows\Powershell\PSReadline\
+
+type .\Appdata\Roaming\Microsoft\Windows\Powershell\PSReadline\ConsoleHost_history.txt
+```
+
 ### Processes running as system
 ```
 tasklist /v /fi "username eq system"

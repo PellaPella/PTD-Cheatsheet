@@ -818,7 +818,7 @@ $ msiexec /quiet /qn /i C:\evil.msi
 ```
 
 ### Bypass UAC
-''' 
+```
 whoami /all
 ```
 If user is running at a medium mandatory level (Mandatory Label\Medium Mandatory Level).

@@ -138,6 +138,8 @@ hydra -P /usr/share/wordlists/rockyou.txt vnc://192.168.2.20:5901
 ### GoBuster
 ```
 gobuster dir -u http://192.168.2.20 -w /usr/share/wordlists/dirb/big.txt -t 50
+gobuster dir -u http://192.168.56.113/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -t 50
+Aggressive search: gobuster dir -u http://192.168.x.x/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -t 1 -z -k -l -x "txt,html,php"
 ```
 ### GET DEFAULT credentials
 ```

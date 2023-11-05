@@ -1,5 +1,11 @@
 # Executive Summary and Vulnerability Rating Table
 
+### Websites
+https://cwe.mitre.org/index.html
+Example
+https://www.hackthebox.com/storage/press/samplereport/sample-penetration-testing-report-template.pdf
+
+
 Summary:  
 - A total of X high vulnerabilities were discovered within the scope, with Y leading to {level of
 access/penetration}.

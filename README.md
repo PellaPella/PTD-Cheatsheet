@@ -264,7 +264,7 @@ connect with listener on kali
 ```
 
 
-
+### if stuck on Server port 80 default page try inspect source code
 
 
 

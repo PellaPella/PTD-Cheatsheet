@@ -18,10 +18,10 @@ are not constrained to (keep it to 3-4 if possible):
 
 - Update the relevant operating system;
 - Update the relevant applications deployed in the {scope}
-• Enforce a strong password policy
-• Review the privileges associated with the different user roles
-• Remove any unnecessary services and resources
-• Train users on the CIA principles.
+- Enforce a strong password policy-
+- Review the privileges associated with the different user roles
+- Remove any unnecessary services and resources
+- Train users on the CIA principles.
 
 # Methodology 
 
@@ -53,11 +53,11 @@ Specify: THE SCOPE in detail – IPs, URLs, accounts
 
 The activities involved:
 
-• Scanning and enumeration of services currently within the target scope
-• Determination of possible vulnerabilities identified within services discovered
-• Assessment and attempted exploitation of vulnerabilities, to eliminate false positive indications and penetrate the
+- Scanning and enumeration of services currently within the target scope
+- Determination of possible vulnerabilities identified within services discovered
+- Assessment and attempted exploitation of vulnerabilities, to eliminate false positive indications and penetrate the
 scoped network as much as possible
-• Reporting of any identified penetrations, vulnerabilities, and recommended remediation advice
+Reporting of any identified penetrations, vulnerabilities, and recommended remediation advice
 
 # Enumeration
 Provide a table with: IP , Ports, Service
@@ -68,13 +68,13 @@ SCREENSHOTS
 The target was scanned with the standard tools and the scan results showed that the system was running over six (6)
 different services which indicated a substantial attack surface. The detailed scan results are shown in Figures 1 and 2,
 
-• The results showed that the system was running an anonymous FTP service as well as an outdated Apache web server.
+- The results showed that the system was running an anonymous FTP service as well as an outdated Apache web server.
 
 Moreover, the system was running NFS with potentially Internet exposed mounts. Critically, the scan results showed
 that the operating system was Linux with an outdated kernel, fact which was reinforced by the outdated versions of the
 SSH and Apache services.
 
-• Given the multiple possible attack vectors, the assessor focused, at the start, on the three most likely exploitable
+- Given the multiple possible attack vectors, the assessor focused, at the start, on the three most likely exploitable
 services: FTP, HTTP and NFS and the details are provided in the next section
 
 # Attack
@@ -87,7 +87,7 @@ The first service investigated was FTP. The assessor attempted to access the ser
 scans had indicated, the system did allow anonymous access. However, the FTP access was found to be limited to a specific directory which was
 empty and did not allow any user uploads (shown in Figure ….).
 
-• The second service investigated was NFS. The assessor undertook a more specific test to determine whether or not any data areas could
+- The second service investigated was NFS. The assessor undertook a more specific test to determine whether or not any data areas could
 potentially be mounted remotely. The results showed that the two areas could potentially be mountable: /srv/ftp and /tmp. Given that the /tmp
 allows in most cases full write privileges, the assessor proceeded to mount the area as shown in Figure …. A quick check of the contents of the
 /tmp directory revealed that a number of temporary files were stored in the directory which indicated that this area could be used for uploading
@@ -96,11 +96,11 @@ files to the remote machine. Moreover, it could be used to compile and run any l
 # Detailed vulnerability information
 
 For each vulnerability specify:
-• Name + CVE or CWE
-• Description
-• Risk
-• Solution
-• Assets Impacted.
+- Name + CVE or CWE-
+- Description
+- Risk
+- Solution
+- Assets Impacted.
 
 # Conclusion and Appendix
 

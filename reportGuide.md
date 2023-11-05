@@ -15,6 +15,7 @@ control of the compromised system)}
 To reduce the risk associated with the vulnerability, it is recommended that SecurityHolesRUs initiate a
 remediation program that covers the actions outlined in this report. The recommendations include, but
 are not constrained to (keep it to 3-4 if possible):
+
 • Update the relevant operating system;
 • Update the relevant applications deployed in the {scope}
 • Enforce a strong password policy
@@ -51,6 +52,7 @@ in order to simulate an Internet based attacker.
 Specify: THE SCOPE in detail – IPs, URLs, accounts
 
 The activities involved:
+
 • Scanning and enumeration of services currently within the target scope
 • Determination of possible vulnerabilities identified within services discovered
 • Assessment and attempted exploitation of vulnerabilities, to eliminate false positive indications and penetrate the
@@ -64,11 +66,14 @@ SCREENSHOTS
 ## Example
 
 The target was scanned with the standard tools and the scan results showed that the system was running over six (6)
-different services which indicated a substantial attack surface. The detailed scan results are shown in Figures 1 and 2, ….
+different services which indicated a substantial attack surface. The detailed scan results are shown in Figures 1 and 2,
+
 • The results showed that the system was running an anonymous FTP service as well as an outdated Apache web server.
+
 Moreover, the system was running NFS with potentially Internet exposed mounts. Critically, the scan results showed
 that the operating system was Linux with an outdated kernel, fact which was reinforced by the outdated versions of the
 SSH and Apache services.
+
 • Given the multiple possible attack vectors, the assessor focused, at the start, on the three most likely exploitable
 services: FTP, HTTP and NFS and the details are provided in the next section
 
@@ -81,6 +86,7 @@ Specify how you found the vulnerability and explain what you could do with it. N
 The first service investigated was FTP. The assessor attempted to access the service using default credentials (anonymous:password) and as the
 scans had indicated, the system did allow anonymous access. However, the FTP access was found to be limited to a specific directory which was
 empty and did not allow any user uploads (shown in Figure ….).
+
 • The second service investigated was NFS. The assessor undertook a more specific test to determine whether or not any data areas could
 potentially be mounted remotely. The results showed that the two areas could potentially be mountable: /srv/ftp and /tmp. Given that the /tmp
 allows in most cases full write privileges, the assessor proceeded to mount the area as shown in Figure …. A quick check of the contents of the

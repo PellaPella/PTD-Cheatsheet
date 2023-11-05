@@ -35,6 +35,8 @@ https://github.com/r3motecontrol/Ghostpack-CompiledBinaries
 ```sudo  nbtscan 192.168.x.x/24```
 ### Scan all ports that are open and services running
 ``` nmap -p- --open -sV -A 192.168.x.x ```
+''' sudo nmap -sV -A -T4 -p- --open 192.168.2.106 '''
+
 ### WPscan
 ```
 wpscan --url URL --plugins-detection aggressive -e vp

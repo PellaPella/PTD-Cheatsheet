@@ -163,6 +163,9 @@ ffuf -u http://${IP}/LFI.php?file=FUZZ -w log.txt -fr "Failed opening" -o fuzz.t
 
 Discover new paths
 ffuf -c -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -e .html,.php,.txt -u 'http://10.0.2.114:8080/FUZZ' -of html -o dir.html -fs 2899
+
+Discover any sort of file based off current URL
+ffuf -c -w /usr/share/seclists/Discovery/Web-Content/common.txt -u 'http://10.0.2.114:8080/administration.php?FUZZ=anything' -of html -o admin-get.html -fs 65
 ```
 ### ZIP cracking
 ```

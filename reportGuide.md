@@ -7,7 +7,7 @@ https://cwe.mitre.org/index.html
 https://www.hackthebox.com/storage/press/samplereport/sample-penetration-testing-report-template.pdf
 
 
-Summary:  
+# Summary 
 - A total of X high vulnerabilities were discovered within the scope, with Y leading to {level of
 access/penetration}.
 • Explain in detail the highest level of penetration

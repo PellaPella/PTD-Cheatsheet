@@ -159,7 +159,10 @@ ffuf -w ./SecLists/Discovery/Web-Content/common.txt -u 192.168.56.125:8080/admin
 ffuf -w /path/to/wordlist -u https://target  -H 'Host: FUZZ.TARGET.DOMAIN'
 # Find log file for poisoning
 cat /usr/share/SecLists/Fuzzing/LFI/LFI-gracefulsecurity-linux.txt | grep log > log.txt 
-ffuf -u http://${IP}/LFI.php?file=FUZZ -w log.txt -fr "Failed opening" -o fuzz.txt 
+ffuf -u http://${IP}/LFI.php?file=FUZZ -w log.txt -fr "Failed opening" -o fuzz.txt
+
+Discover new paths
+ffuf -c -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -e .html,.php,.txt -u http://10.0.2.114:8080/FUZZ -of html -o dir.html -fs 2899
 ```
 ### ZIP cracking
 ```

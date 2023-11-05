@@ -1112,6 +1112,12 @@ Once in if on windows do whoami /all to see users groups
 chmod 777 OR chmod 600
 chmod +x file_name  - give current user permisson
 ```
+
+### Find directories that are writable linux
+```
+find / -type d -writable -print
+```
+
 ### Connect to SQL server with login
 ```
 sqsh -S 192.168.2.x -U 192.168.2.x\\user_name -P this1smyPassword

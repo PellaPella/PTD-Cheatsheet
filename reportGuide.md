@@ -16,8 +16,8 @@ To reduce the risk associated with the vulnerability, it is recommended that Sec
 remediation program that covers the actions outlined in this report. The recommendations include, but
 are not constrained to (keep it to 3-4 if possible):
 
-• Update the relevant operating system;
-• Update the relevant applications deployed in the {scope}
+- Update the relevant operating system;
+- Update the relevant applications deployed in the {scope}
 • Enforce a strong password policy
 • Review the privileges associated with the different user roles
 • Remove any unnecessary services and resources

@@ -468,6 +468,7 @@ uname -a // What OS kernel are we using?
 // Popular Linux Kernel Exploits
 
 Dirty COW (CVE-2016-5195)
+version < 2.6.22
 URL: https://dirtycow.ninja/
 
 Other Kernel Expliots

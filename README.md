@@ -984,12 +984,12 @@ if not working try
 
 ### Juicy Potato
 Versions
-Windows_10_Enterprise
-Windows_10_Pro
-Windows_7_Enterprise
-Windows_8.1_Enterprise
-Windows_Server_2008_R2_Enterprise
-Windows_Server_2012_Datacenter
+- Windows_10_Enterprise
+- Windows_10_Pro
+- Windows_7_Enterprise
+- Windows_8.1_Enterprise
+- Windows_Server_2008_R2_Enterprise
+- Windows_Server_2012_Datacenter
 
 https://github.com/ohpe/juicy-potato/releases
 ```

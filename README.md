@@ -38,6 +38,9 @@ https://github.com/r3motecontrol/Ghostpack-CompiledBinaries
 nmap -p- --open -sV -A 192.168.x.x
 # Full scan
 sudo nmap -sV -A -T4 -p- --open 192.168.2.106
+
+IF NMAP IS SLOW
+masscan -e tun0 -p1-65535,U:1-65535 10.10.10.x --rate=500
 ```
 
 ### WPscan

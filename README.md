@@ -150,7 +150,8 @@ gobuster dir -u http://192.168.56.113/ -w /usr/share/wordlists/dirbuster/directo
 Aggressive search: gobuster dir -u http://192.168.x.x/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -t 1 -z -k -l -x "txt,html,php"
 
 Ignore status errors - if no page is found
-gobuster dir -u http://10.10.11.57 -w /usr/share/wordlists/dirb/common.txt -x php,html,txt -k -s 200,204,301,302,307,403,401 -b 302
+gobuster dir -u http://10.10.10.10 -w /usr/share/wordlists/dirb/common.txt -x php,html,txt -k -s 200,204,301,302,307,403,401 -b 302
+gobuster dir -u http://0.0.0.0 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -t 50 -b 301
 ```
 ### GET DEFAULT credentials
 ```

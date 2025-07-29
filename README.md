@@ -310,7 +310,10 @@ connect with listener on kali
 
 ### if stuck on Server port 80 default page try inspect source code
 
-
+### cookie inclusion with curl command
+```
+curl -sv domain/api --cookie "<value>" | jq
+```
 
 
 ## Escalate Privileges

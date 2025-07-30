@@ -77,12 +77,13 @@ Lists the processes that are being launched in real time, including processes ow
 ```
 
 ### Wordy websites
-
+```
 Scan for login details
-``` wpscan --url http://wordy/ --enumerate p --enumerate t --enumerate u```
+wpscan --url http://wordy/ --enumerate p --enumerate t --enumerate u
 
 Save all account details in file and run
-```wpscan --url //wordy/ -U users -P password```
+wpscan --url //wordy/ -U users -P password
+```
 
 ### smbmap 
 ```

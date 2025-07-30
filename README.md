@@ -77,44 +77,45 @@ Lists the processes that are being launched in real time, including processes ow
 ```
 
 ### Wordy websites
+
 Scan for login details
 ``` wpscan --url http://wordy/ --enumerate p --enumerate t --enumerate u```
+
 Save all account details in file and run
 ```wpscan --url //wordy/ -U users -P password```
 
-### SMBClient
+### smbmap 
 ```
-smbclient \\\\IP\\ -L -N
-# If somehow the above command does not work (showing access denied)
-smbclient \\\\IP\\ -L -N -I IP
-# use the similar command option to login to the share
-smbclient \\\\IP\\SHARE -N -I IP
-# Login using null session
-smbclient \\\\192.168.x.x\\SHARE_NAME -N
-
-If you can enumerate share try cd ../
-
-Enumerate Shares - https://nmap.org/nsedoc/scripts/smb-enum-shares.html
-nmap --script smb-enum-shares.nse -p445 <host>
-sudo nmap -sU -sS --script smb-enum-shares.nse -p U:137,T:139 <host>
-
-https://nmap.org/nsedoc/scripts/smb-ls.html
-nmap -p 445 <ip> --script smb-ls --script-args 'share=c$,path=\temp'
-nmap -p 445 <ip> --script smb-enum-shares,smb-ls
-```
-### smbmap
-```
-# domain is optional, may put -u '' -p '' to confirm null session access
+# Defualt search - domain is optional
+-u '' -p '' to confirm null session access
 smbmap -H IP -d DOMAIN -u domain_user -p pass -H IP
+
 # depth probably > 5 if you wanna traverse and search deep into a share
 smbmap -H IP -R SHARES -A PATTEN --depth 6 -q
+
+# Check for SMB vuln
+nmap –script smb-vuln* -p 445 192.168.2.15
+
+# Enumerate Shares -- https://nmap.org/nsedoc/scripts/smb-enum-shares.html
+nmap --script smb-enum-shares.nse -p445 <host>
+sudo nmap -sU -sS --script smb-enum-shares.nse -p U:137,T:139 <host>
+- Note: try cd ../ if you can enter the share and enumerate it
+
+# Locate temp file in shares
+nmap -p 445 <ip> --script smb-ls --script-args 'share=c$,path=\temp'
+nmap -p 445 <ip> --script smb-enum-shares,smb-ls
+
+# SMBClient to enumerate 
+smbclient \\\\IP\\ -L -N
+smbclient \\\\IP\\ -L -N -I IP
+smbclient \\\\IP\\SHARE -N -I IP
+
+# Login using null session
+smbclient \\\\192.168.x.x\\SHARE_NAME -N
 ```
 
 ### Nikto directory finder
 ``` nikto -h http://IP/```
-
-### Check for SMB Vuln
-``` nmap –script smb-vuln* -p 445 192.168.2.15```
 
 ### Check shellshock
 ```

